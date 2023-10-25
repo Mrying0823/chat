@@ -1,0 +1,90 @@
+.main-container {
+    width: 100%;
+}
+
+.chat-container {
+    margin: 50px auto;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px #ccc;
+    font-family: "Source Code Pro Light", sans-serif;
+    height: 100%;
+}
+
+.chat-header {
+    background-color: white;
+    color: black;
+    align-content: center;
+    padding: 1px 10px;
+}
+
+.chat-messages {
+    height: 100%;
+    min-height: 1000px;
+    padding: 10px;
+}
+
+.chat-message {
+    margin-bottom: 10px;
+    border-radius: 5px;
+    padding: 8px 0px;
+
+}
+.chat-message p{
+    white-space: pre-line
+}
+
+.chat-reply {
+    justify-content: flex-start;
+}
+
+#app{
+    background: whitesmoke;
+}
+
+.chat-question {
+    background: white;
+    color: black;
+    padding: 30px 10px;
+    margin: 30px 0px;
+}
+
+.chat-reply  {
+    padding: 10px;
+    background-color: black;
+    color: white;
+}
+
+.chat-input {
+    text-align: center;
+    margin-bottom: 30px;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.chat-input input {
+    line-height: 30px;
+    width: 300px;
+}
+
+.chat-input {
+    display: flex;
+    align-items: center;
+    line-height: 30px;
+}
+
+.message-input {
+    margin-right: 10px;
+}
+
+.chat-message-container {
+    list-style: none;
+    padding: 0;
+}
+
+.chat-img {
+    width: 200px;
+    height: 200px;
+    margin-left: 10px;
+}
