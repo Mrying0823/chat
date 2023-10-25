@@ -20,24 +20,24 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ChatgptController extends BaseController {
 
     // 新建 chatgpt 对话
-    @ApiOperation(value = "新建 chatgpt 会话",notes = "新建 chatgpt 会话")
-    @ApiImplicitParam(name = "conversationType",value = "会话类型",required = true)
-    @PostMapping("/chatgpt/createConversation")
-    public RespResult createConversation(@RequestParam("conversationType") Integer conversationType) {
-        RespResult respResult = RespResult.fail();
-
-        Conversation conversation = new Conversation();
-        conversation.setConversationType(conversationType);
-
-        String conversationId = conversationService.createConversation(conversation);
-
-        if (conversationId != null) {
-            respResult = RespResult.ok();
-            respResult.setConversationId(conversationId);
-        }
-
-        return respResult;
-    }
+//    @ApiOperation(value = "新建 chatgpt 会话",notes = "新建 chatgpt 会话")
+//    @ApiImplicitParam(name = "conversationType",value = "会话类型",required = true)
+//    @PostMapping("/chatgpt/createConversation")
+//    public RespResult createConversation(@RequestParam("conversationType") Integer conversationType) {
+//        RespResult respResult = RespResult.fail();
+//
+//        Conversation conversation = new Conversation();
+//        conversation.setConversationType(conversationType);
+//
+//        String conversationId = conversationService.createConversation(conversation);
+//
+//        if (conversationId != null) {
+//            respResult = RespResult.ok();
+//            respResult.setConversationId(conversationId);
+//        }
+//
+//        return respResult;
+//    }
 
     // chatgpt 流式对话配合 Spring SseEmitter 使用
     // SSE（Server-Sent Event）是一种实时通知、事件推送和即时通讯的协议
