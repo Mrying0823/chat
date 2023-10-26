@@ -1,23 +1,20 @@
 package org.mrying.chat.service.impl;
 
 import com.plexpt.chatgpt.ChatGPTStream;
+import com.plexpt.chatgpt.entity.chat.ChatCompletion;
 import com.plexpt.chatgpt.entity.chat.Message;
-import org.mrying.chat.constants.Constants;
+import com.plexpt.chatgpt.util.SseHelper;
 import org.mrying.chat.event.GptEventSourceListener;
-import org.mrying.chat.exception.NoTokenCountException;
 import org.mrying.chat.mapper.ChatgptMessageMapper;
 import org.mrying.chat.mapper.UserMapper;
 import org.mrying.chat.model.ChatgptMessage;
-import org.mrying.chat.model.User;
 import org.mrying.chat.service.ChatgptService;
 import org.mrying.chat.settings.ChatgptConfiguration;
 import org.mrying.chat.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -101,9 +98,8 @@ public class ChatgptServiceImpl implements ChatgptService {
         // 3、借助 SDK 工具，实例化 ChatGPTStream 工具类对象
         // 多 KEY 自动轮询 .apiKeyList()
         ChatGPTStream chatGPTStream = ChatGPTStream.builder()
-                .timeout(-1L)
+                .timeout(50)
                 .apiKey(chatgptConfiguration.getGptKey())
-                // .proxy(proxy)
                 .apiHost(chatgptConfiguration.getHost())
                 .build()
                 .init();
@@ -120,11 +116,11 @@ public class ChatgptServiceImpl implements ChatgptService {
         Message message = Message.of(prompt);
         messages.add(message);
 
-//        ConsoleStreamListener listener = new ConsoleStreamListener();
-//        Message message = Message.of("写一段七言绝句诗，题目是：火锅！");
-//        ChatCompletion chatCompletion = ChatCompletion.builder()
-//                .messages(Arrays.asList(message))
-//                .build();
+        ChatCompletion chatCompletion = ChatCompletion.builder()
+                .messages(messages)
+                .model(ChatCompletion.Model.GPT_3_5_TURBO.getName())
+                .maxTokens(4096)
+                .build();
 
         // 7、设置完成时的回调函数
         listener.setOnComplete(msg -> {
@@ -139,17 +135,13 @@ public class ChatgptServiceImpl implements ChatgptService {
 //                    throw new RuntimeException("扣除公用 api 使用次数失败");
 //                }
 //            }
-            try {
-                sseEmitter.send("[DONE]");
-                sseEmitter.complete();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            SseHelper.send(sseEmitter,"[DONE]");
+            SseHelper.complete(sseEmitter);
             System.out.println(msg);
         });
 
         // 8、提问
-        chatGPTStream.streamChatCompletion(messages,listener);
+        chatGPTStream.streamChatCompletion(chatCompletion,listener);
 
         return sseEmitter;
     }
