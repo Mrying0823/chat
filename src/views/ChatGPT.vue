@@ -32,13 +32,15 @@ import qs from "qs";
 marked.setOptions({
   // 自定义高亮代码块的渲染
   // lang 用于指定代码块的语言
-  highlight: function (code) {
-    return hljs.highlightAuto(code).value;
+  langPrefix: 'hljs language-',
+  highlight(code, lang) {
+    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+    return hljs.highlight(code, { language }).value;
   }
 });
 
 export default {
-  name: "GPTWindow2",
+  name: "ChatGPT",
   data() {
     return {
       // 提问
@@ -64,6 +66,8 @@ export default {
       return localStorage.getItem("user")
     },
     onSendMessage() {
+      let this_ = this;
+
       console.log("message: ",this.message);
 
       // 发送消息为空
@@ -86,6 +90,13 @@ export default {
         return;
       }
 
+      this.generating = true;
+
+      this_.items.push({user: 'user', message: this_.message});
+
+      this.onGetMessage();
+    },
+    onGetMessage() {
       let this_ = this;
 
       const data = {usePublicApi: this_.usePublicApi,prompt: this_.message,conversationId: this_.conversationId};
@@ -93,16 +104,14 @@ export default {
 
       console.log(requestData);
 
-      let sse = new EventSource(`http://localhost:8081/api/v1/chatgpt/chat?`+requestData);
+      let sse = new EventSource(`http://localhost:8081/api/v1/chatgpt/chat?`+requestData,{withCredentials: true});
 
-      this.generating = true;
-
-      this_.items.push({user: 'user', message: this_.message});
-      this_.message = "";
+      // this_.message = "";
 
       sse.addEventListener("open",(function () {
         console.log('open');
         this_.generating = true;
+        this_.message = "";
         this_.items.push({user: 'bot', message: ''});
       }));
 
@@ -129,8 +138,19 @@ export default {
 
       sse.addEventListener("error",function (event) {
         console.log("error: "+event.data);
-        this_.generating = false;
         sse.close();
+
+        this_.$message({
+          type: "error",
+          center: true,
+          message: "服务繁忙，请稍后重试"
+        });
+
+        this_.generating = true;
+
+        setTimeout(() => {
+          this_.generating = false;
+        },10000);
       });
     }
   },
