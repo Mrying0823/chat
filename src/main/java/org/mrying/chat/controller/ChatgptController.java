@@ -9,35 +9,38 @@ import org.mrying.chat.view.RespResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Map;
+
 /**
  * @author 邓和颖
  * @since 2023/10/14 16:27
  */
 
+@CrossOrigin(value = "http://localhost:8080/gpt/chatGPT")
 @Api(tags = "ChatGPT 相关")
 @RequestMapping("/v1")
 @RestController
 public class ChatgptController extends BaseController {
 
     // 新建 chatgpt 对话
-//    @ApiOperation(value = "新建 chatgpt 会话",notes = "新建 chatgpt 会话")
-//    @ApiImplicitParam(name = "conversationType",value = "会话类型",required = true)
-//    @PostMapping("/chatgpt/createConversation")
-//    public RespResult createConversation(@RequestParam("conversationType") Integer conversationType) {
-//        RespResult respResult = RespResult.fail();
-//
-//        Conversation conversation = new Conversation();
-//        conversation.setConversationType(conversationType);
-//
-//        String conversationId = conversationService.createConversation(conversation);
-//
-//        if (conversationId != null) {
-//            respResult = RespResult.ok();
-//            respResult.setConversationId(conversationId);
-//        }
-//
-//        return respResult;
-//    }
+    @ApiOperation(value = "新建 chatgpt 会话",notes = "新建 chatgpt 会话")
+    @ApiImplicitParam(name = "conversationType",value = "会话类型",required = true)
+    @PostMapping("/chatgpt/createConversation")
+    public RespResult createConversation(@RequestParam("conversationType") Integer conversationType) {
+        RespResult respResult = RespResult.fail();
+
+        Conversation conversation = new Conversation();
+        conversation.setConversationType(conversationType);
+
+        String conversationId = conversationService.createConversation(conversation);
+
+        if (conversationId != null) {
+            respResult = RespResult.ok();
+            respResult.setConversationId(conversationId);
+        }
+
+        return respResult;
+    }
 
     // chatgpt 流式对话配合 Spring SseEmitter 使用
     // SSE（Server-Sent Event）是一种实时通知、事件推送和即时通讯的协议
@@ -55,9 +58,15 @@ public class ChatgptController extends BaseController {
         return chatgptService.sendMsgBySse(usePublicApi,conversationId,prompt);
     }
 
-//    @GetMapping(path = "/chatgpt/chat",produces="text/event-stream;charset=utf-8")
-//    public SseEmitter chat() {
-//
-//        return chatgptService.sendMsgBySse(true,"da49e02a656a4bcf9bd3b0453e96010c","today is sunny");
-//    }
+    @ApiOperation(value = "chatgpt 流式对话",notes = "chatgpt 流式对话配合 Spring SseEmitter")
+    @PostMapping(path = "/chatgpt/chatPost",produces="text/event-stream;charset=utf-8")
+    public SseEmitter chatPost(@RequestBody Map<String,String> map) {
+
+        Boolean usePublicApi = "true".equals(map.get("usePublicApi"));
+        String conversationId = map.get("conversationId");
+        String prompt = map.get("prompt");
+
+
+        return chatgptService.sendMsgBySse(usePublicApi,conversationId,prompt);
+    }
 }
