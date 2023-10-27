@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.mrying.chat.mapper.ConversationMapper" >
+  <resultMap id="BaseResultMap" type="org.mrying.chat.model.Conversation" >
+    <id column="conversation_id" property="conversationId" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="conversation_type" property="conversationType" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    conversation_id, user_id, conversation_type, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from blog_conversation
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from blog_conversation
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="org.mrying.chat.model.Conversation" >
+    insert into blog_conversation (conversation_id, user_id, conversation_type, 
+      create_time)
+    values (#{conversationId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{conversationType,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="org.mrying.chat.model.Conversation" >
+    insert into blog_conversation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="conversationId != null" >
+        conversation_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="conversationType != null" >
+        conversation_type,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="conversationId != null" >
+        #{conversationId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="conversationType != null" >
+        #{conversationType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.mrying.chat.model.Conversation" >
+    update blog_conversation
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="conversationType != null" >
+        conversation_type = #{conversationType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.mrying.chat.model.Conversation" >
+    update blog_conversation
+    set user_id = #{userId,jdbcType=VARCHAR},
+      conversation_type = #{conversationType,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+  </update>
+
+  <insert id="InsertNewConversation" parameterType="org.mrying.chat.model.Conversation">
+    insert into blog_conversation (conversation_id, user_id, conversation_type,
+                                   create_time)
+    values (#{conversationId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{conversationType,jdbcType=INTEGER},
+            #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+</mapper>
