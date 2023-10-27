@@ -66,7 +66,6 @@ public class ChatgptController extends BaseController {
         String conversationId = map.get("conversationId");
         String prompt = map.get("prompt");
 
-
         return chatgptService.sendMsgBySse(usePublicApi,conversationId,prompt);
     }
 }
