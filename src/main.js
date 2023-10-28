@@ -6,7 +6,6 @@ import 'element-plus/dist/index.css'
 // 引入element icon
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
-import './assets/css/index.css'
 
 // 创建应用实例
 const app = createApp(App);
