@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 邓和颖
@@ -33,8 +34,14 @@ public class ConversationServiceImpl implements ConversationService {
         // 设置会话 ID
         conversation.setConversationId(UUIDUtils.getUUID());
         // 保存创建的会话
-        conversationMapper.InsertNewConversation(conversation);
+        conversationMapper.insertNewConversation(conversation);
         // 返回会话 ID
         return conversation.getConversationId();
+    }
+
+    // 根据用户 id 查询所有会话
+    @Override
+    public List<Conversation> queryConversationByUserId(String userId) {
+        return conversationMapper.selectConversationByUserId(userId);
     }
 }

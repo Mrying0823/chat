@@ -6,9 +6,10 @@
     <result column="user_id" property="userId" jdbcType="VARCHAR" />
     <result column="conversation_type" property="conversationType" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="conversation_name" property="conversationName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    conversation_id, user_id, conversation_type, create_time
+    conversation_id, user_id, conversation_type, create_time,conversation_name
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -80,10 +81,19 @@
     where conversation_id = #{conversationId,jdbcType=VARCHAR}
   </update>
 
-  <insert id="InsertNewConversation" parameterType="org.mrying.chat.model.Conversation">
+  <insert id="insertNewConversation" parameterType="org.mrying.chat.model.Conversation">
     insert into blog_conversation (conversation_id, user_id, conversation_type,
-                                   create_time)
+                                   create_time,conversation_name)
     values (#{conversationId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{conversationType,jdbcType=INTEGER},
-            #{createTime,jdbcType=TIMESTAMP})
+            #{createTime,jdbcType=TIMESTAMP}, #{conversationName,jdbcType=VARCHAR})
   </insert>
+
+  <!-- 根据用户 id 查询所有会话 -->
+  <select id="selectConversationByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from blog_conversation
+    where user_id = #{userId,jdbcType=VARCHAR}
+    order by create_time desc
+  </select>
 </mapper>
