@@ -2,6 +2,9 @@ package org.mrying.chat.model;
 
 import java.util.Date;
 
+/**
+ * @author 邓和颖
+ */
 public class Conversation {
     private String conversationId;
 
@@ -10,6 +13,10 @@ public class Conversation {
     private Integer conversationType;
 
     private Date createTime;
+
+    private String conversationName;
+
+    private String firstMessage;
 
     public String getConversationId() {
         return conversationId;
@@ -41,5 +48,21 @@ public class Conversation {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getConversationName() {
+        return conversationName;
+    }
+
+    public void setConversationName(String conversationName) {
+        this.conversationName = conversationName;
+    }
+
+    public String getFirstMessage() {
+        return firstMessage;
+    }
+
+    public void setFirstMessage(String firstMessage) {
+        this.firstMessage = firstMessage;
     }
 }
