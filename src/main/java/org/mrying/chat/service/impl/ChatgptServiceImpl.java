@@ -71,7 +71,7 @@ public class ChatgptServiceImpl implements ChatgptService {
     }
 
     // 保存当前对话内容
-    private int saveCurrentMessage(String conversationId,String msg,Integer messageDirection) {
+    private void saveCurrentMessage(String conversationId,String msg,Integer messageDirection) {
         ChatgptMessage message = new ChatgptMessage();
         message.setMessageId(UUIDUtils.getUUID());
         message.setMessageDirection(messageDirection);
@@ -80,11 +80,9 @@ public class ChatgptServiceImpl implements ChatgptService {
 
         if(conversationId != null) {
             message.setConversationId(conversationId);
-        }else {
-            message.setConversationId(UUIDUtils.getUUID());
         }
 
-        return chatgptMessageMapper.insertCurrentMessage(message);
+        chatgptMessageMapper.insertCurrentMessage(message);
     }
 
     // 向 chatgpt 提问
