@@ -5,7 +5,8 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 // 引入element icon
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import 'element-plus/dist/index.css'
+import '@/assets/css/chatGPT.css'
+import '@/assets/css/chatGPTSidebar.css'
 
 // 创建应用实例
 const app = createApp(App);

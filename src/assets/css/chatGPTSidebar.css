@@ -1,0 +1,60 @@
+.sidebar {
+    height: 100%;
+    box-sizing: border-box;
+    background: darkcyan;
+    padding: 10px;
+}
+
+.create-btn {
+    width: 13vw;
+    color: white;
+    background-color: transparent;
+    border-color: white;
+    font-family: "Source Code Pro Light", sans-serif;
+}
+
+.create-btn:hover,
+.create-btn:active{
+    /* 鼠标悬停状态的按钮背景颜色和文本颜色 */
+    background-color: #1ab2b2;
+    color: white;
+    border-color: white;
+}
+
+.conversation-list {
+    max-height: 92%;
+    font-size: 14px;
+    font-family: "Source Code Pro Light", sans-serif;
+}
+
+.conversation-ul {
+    list-style: none; /* 移除圆点 */
+    padding: 0; /* 移除默认内边距 */
+}
+
+.conversation {
+    cursor: pointer; /* 手势鼠标 */
+    user-select: none; /* 不显示输入光标 */
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    font-size: 14px;
+    margin: 8px 0;
+    padding: 10px;
+    background-color: transparent;
+    color: white;
+}
+
+.conversation:hover,
+.conversation:focus{
+    /* 鼠标悬停状态的按钮背景颜色和文本颜色 */
+    background-color: #1ab2b2;
+    color: white;
+    border-radius: 4px;
+}
+
+.conversation-active {
+    background-color: #1ab2b2;
+    color: white;
+    border-radius: 4px;
+}

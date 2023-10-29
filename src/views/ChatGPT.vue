@@ -1,16 +1,15 @@
 <template>
   <el-container class="chat-container">
     <el-aside class="chat-aside">
-      <ChatGPTSidebar></ChatGPTSidebar>
+      <ChatGPTSidebar @tran-messageList="handleDataFromChild"></ChatGPTSidebar>
     </el-aside>
       <el-container class="chat-container-message">
-        <el-main>
+        <el-main class="chat-message">
           <el-scrollbar>
             <ul>
-              <li v-for="(item,i) in items" :key="i"
-                  :class="item.user==='bot'? 'chat-reply':'chat-question'">
-                <div :class="item.user==='bot'? 'reply-info':'question-info'">
-                  <div v-html="item.html? item.html : item.message || ''" :class="item.user==='bot'? 'reply-info-content':'question-info-content'"></div>
+              <li v-for="item in items" :key="item.messageId" :class="item.messageDirection==='1'? 'chat-reply':'chat-question'">
+                <div :class="item.messageDirection ==='1'? 'reply-info':'question-info'">
+                  <div v-html="item.html? item.html : item.content || ''" :class="item.messageDirection==='1'? 'reply-info-content':'question-info-content'"></div>
                 </div>
               </li>
             </ul>
@@ -60,6 +59,12 @@ export default {
   },
 
   methods: {
+    // 处理子组件传递过来的参数
+    handleDataFromChild(messageList) {
+      this.items = messageList; // 更新父组件的数据
+      console.log(messageList);
+    },
+
     // 阻止 el-input 回车的默认行为
     handleKeyDown(event) {
       if (event.keyCode === 13 && !event.shiftKey) {
@@ -105,21 +110,19 @@ export default {
 
       this.generating = true;
 
-      this_.items.push({user: 'user', message: this_.message});
+      this_.items.push({messageDirection: 'user', message: this_.message});
 
       this.onGetMessage();
     },
     onGetMessage() {
       let this_ = this;
 
-      const data = {usePublicApi: this_.usePublicApi,prompt: this_.message,conversationId: "6644696e5fb74a6b9607695ecced315c"};
+      const data = {usePublicApi: this_.usePublicApi,prompt: this_.message,conversationId: "85cc382d39354804b72ae211122042d5"};
       const requestData = qs.stringify(data);
 
       console.log(requestData);
 
       let sse = new EventSource(`http://localhost:8081/api/v1/chatgpt/chat?`+requestData,{withCredentials: true});
-
-      // this_.message = "";
 
       sse.addEventListener("open",(function () {
         console.log('open');
@@ -141,12 +144,7 @@ export default {
         last.message += answer;
         let words = last.message.split('');
         let html = words.join('');
-        last.html = marked.marked(html);
-        document.querySelectorAll('code').forEach((block) => {
-          if (!block.classList.contains('hljs')) {
-            block.classList.add('hljs');
-          }
-        });
+        last.html = marked.parse(html);
       });
 
       sse.addEventListener("error",function (event) {
@@ -180,120 +178,6 @@ export default {
 </script>
 
 <style scoped>
-.chat-container {
-  width: 100%; /* 设置容器宽度为100% */
-  padding: 20px; /* 设置容器内边距，可以根据需要进行调整 */
-  box-sizing: border-box; /* 设置盒模型为border-box，确保内边距和边框不会增加容器的宽度 */
-  height: 97vh;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 10px #ccc;
-  font-family: "Source Code Pro Light", sans-serif;
-  background: whitesmoke;
-}
-
-.chat-container-message {
-  box-sizing: border-box;
-  height: 100%;
-  width: 100%;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 10px #ccc;
-}
-
-.chat-aside {
-  padding-right: 20px;
-  width: auto;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.chat-img{
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.chat-question {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
-}
-
-.question-info {
-  width: 90%;
-  margin-left: 10px;
-  text-align: right;
-}
-
-.question-info-content {
-  max-width: 70%;
-  padding: 10px;
-  font-size: 14px;
-  float: right;
-  margin-right: 10px;
-  position: relative;
-  margin-top: 8px;
-  background: #A3C3F6;
-  text-align: left;
-}
-
-.question-info-content::after {
-  position: absolute;
-  right: -8px;
-  top: 8px;
-  content: '';
-  border-left: 10px solid #A3C3F6;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-}
-
-.chat-reply {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.reply-info {
-  margin-left: 10px;
-  text-align: left;
-}
-
-.reply-time {
-  font-size: 12px;
-  color: rgba(51, 51, 51, 0.8);
-  height: 20px;
-  line-height: 20px;
-  margin: -5px 0 0;
-}
-
-.reply-info-content {
-  padding: 10px;
-  font-size: 14px;
-  background: #fff;
-  position: relative;
-  margin-top: 8px;
-}
-
-.reply-info-content::before {
-  position: absolute;
-  left: -8px;
-  top: 8px;
-  content: '';
-  border-right: 10px solid #FFF;
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
-}
-
-.chat-input {
-  background: whitesmoke;
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 10px #ccc;
-}
-
-.message-input {
-  flex: 1;
-}
-
 .borderNone >>>.el-textarea__inner {
   border: 0;
   resize: none;

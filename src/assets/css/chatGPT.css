@@ -1,0 +1,104 @@
+.chat-container {
+    width: 100%; /* 设置容器宽度为100% */
+    padding: 20px; /* 设置容器内边距，可以根据需要进行调整 */
+    box-sizing: border-box; /* 设置盒模型为border-box，确保内边距和边框不会增加容器的宽度 */
+    height: 97vh;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px #ccc;
+    font-family: "Source Code Pro Light", sans-serif;
+    background: white;
+}
+
+.chat-container-message {
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px #ccc;
+}
+
+.chat-aside {
+    width: auto;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.chat-message {
+    width: 100%;
+}
+
+.chat-question {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.question-info {
+    width: 90%;
+    margin-left: 10px;
+    text-align: right;
+}
+
+.question-info-content {
+    max-width: 70%;
+    padding: 10px;
+    font-size: 14px;
+    float: right;
+    color: black;
+    margin-right: 10px;
+    position: relative;
+    margin-top: 8px;
+    background: whitesmoke;
+    text-align: left;
+}
+
+.question-info-content::after {
+    position: absolute;
+    right: -8px;
+    top: 8px;
+    content: '';
+    border-left: 10px solid whitesmoke;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.chat-reply {
+    justify-content: flex-start;
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.reply-info {
+    text-align: left;
+}
+
+.reply-info-content {
+    padding: 10px;
+    font-size: 14px;
+    color: white;
+    background: darkcyan;
+    position: relative;
+    margin-top: 8px;
+}
+
+.reply-info-content::before {
+    position: absolute;
+    left: -8px;
+    top: 8px;
+    content: '';
+    border-right: 10px solid darkcyan;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.chat-input {
+    background: whitesmoke;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px #ccc;
+}
+
+.message-input {
+    flex: 1;
+}
