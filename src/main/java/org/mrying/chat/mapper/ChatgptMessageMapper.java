@@ -17,4 +17,7 @@ public interface ChatgptMessageMapper {
 
     // 根据 conversationId 查询某个会话的若干条对话
     List<ChatgptMessage> selectMessagesByConversationId(@Param("conversationId") String conversationId, @Param("limit") Integer limit);
+
+    // 根据 conversationId 查询某个会话的所有对话
+    List<ChatgptMessage> selectAllMessagesByConversationId(@Param("conversationId") String conversationId);
 }

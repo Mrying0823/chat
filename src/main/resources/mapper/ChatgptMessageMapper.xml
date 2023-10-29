@@ -108,4 +108,13 @@
     order by create_time desc
     limit #{limit,jdbcType=INTEGER}
   </select>
+
+  <!-- 根据 conversationId 查询某个会话的所有对话 -->
+  <select id="selectAllMessagesByConversationId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from blog_chatgpt_message
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+    order by create_time desc
+  </select>
 </mapper>

@@ -1,5 +1,6 @@
 package org.mrying.chat.controller;
 
+import org.mrying.chat.service.ChatgptMessageService;
 import org.mrying.chat.service.ChatgptService;
 import org.mrying.chat.service.ConversationService;
 
@@ -16,4 +17,7 @@ public class BaseController {
 
     @Resource
     protected ChatgptService chatgptService;
+
+    @Resource
+    protected ChatgptMessageService chatgptMessageService;
 }

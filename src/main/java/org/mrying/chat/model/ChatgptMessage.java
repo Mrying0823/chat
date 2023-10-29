@@ -2,6 +2,9 @@ package org.mrying.chat.model;
 
 import java.util.Date;
 
+/**
+ * @author 邓和颖
+ */
 public class ChatgptMessage {
     private String messageId;
 
