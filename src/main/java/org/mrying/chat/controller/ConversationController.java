@@ -22,8 +22,8 @@ public class ConversationController extends BaseController {
     // 新建 chatgpt 对话
     @ApiOperation(value = "新建 chatgpt 会话",notes = "新建 chatgpt 会话")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "conversationType",value = "会话类型",required = false),
-            @ApiImplicitParam(name = "conversationName",value = "会话名称",required = false)
+            @ApiImplicitParam(name = "conversationType",value = "会话类型"),
+            @ApiImplicitParam(name = "conversationName",value = "会话名称")
     })
     @PostMapping("/chatgpt/createConversation")
     public RespResult createConversation(@RequestParam("conversationType") Integer conversationType,
@@ -46,6 +46,7 @@ public class ConversationController extends BaseController {
     }
 
     // 获取用户已创建的所有 chatgpt 会话
+    @ApiOperation(value = "获取 chatgpt 会话列表",notes = "获取用户已创建的所有 chatgpt 会话")
     @GetMapping("/chatgpt/getConversation")
     public RespResult getConversation() {
         RespResult respResult = RespResult.fail();
@@ -53,7 +54,7 @@ public class ConversationController extends BaseController {
         List<Conversation> conversationList = conversationService.queryConversationByUserId("34382773848d4c86acb1f960c4681530");
 
         if(conversationList.isEmpty()) {
-            respResult.setMsg("请创建会话");
+            respResult.setMsg("开启 chatGPT 对话吧");
         }
 
         respResult = RespResult.ok();

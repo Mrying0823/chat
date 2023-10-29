@@ -131,7 +131,7 @@ public class ChatgptServiceImpl implements ChatgptService {
 
         // 5、加入历史消息记录，提供上下文信息
         List<Message> messages = conversationId != null ?
-                transform(queryMessagesByConversationId(conversationId,Constants.MESSAGE_LIMIT_NUM)) : new ArrayList<>();
+                transform(chatgptMessageMapper.selectMessagesByConversationId(conversationId,Constants.MESSAGE_LIMIT_NUM)) : new ArrayList<>();
 
         // 6、加入本次提问问题
         Message message = Message.of(prompt);
@@ -164,14 +164,5 @@ public class ChatgptServiceImpl implements ChatgptService {
         chatGPTStream.streamChatCompletion(chatCompletion,listener);
 
         return sseEmitter;
-    }
-
-    // 根据 conversationId 查询某个会话的若干条对话
-    @Override
-    public List<ChatgptMessage> queryMessagesByConversationId(String conversationId, Integer limit) {
-        // 校验会话是否属于当前用户
-
-        // 根据 conversationId 查询某个会话的若干条对话
-        return chatgptMessageMapper.selectMessagesByConversationId(conversationId,limit);
     }
 }
