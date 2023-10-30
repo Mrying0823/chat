@@ -92,6 +92,7 @@
 }
 
 .chat-input {
+    cursor: pointer;
     background: whitesmoke;
     display: flex;
     align-items: center;
