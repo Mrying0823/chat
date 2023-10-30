@@ -1,15 +1,15 @@
 <template>
   <el-container class="chat-container">
     <el-aside class="chat-aside">
-      <ChatGPTSidebar @tran-messageList="handleDataFromChild"></ChatGPTSidebar>
+      <ChatGPTSidebar @tran-messageList="updateMessageList" @tran-conversationId="updateConversationId" :conversationId="conversationId"></ChatGPTSidebar>
     </el-aside>
       <el-container class="chat-container-message">
         <el-main class="chat-message">
-          <el-scrollbar>
-            <ul>
-              <li v-for="item in items" :key="item.messageId" :class="item.messageDirection==='1'? 'chat-reply':'chat-question'">
-                <div :class="item.messageDirection ==='1'? 'reply-info':'question-info'">
-                  <div v-html="item.html? item.html : item.content || ''" :class="item.messageDirection==='1'? 'reply-info-content':'question-info-content'"></div>
+          <el-scrollbar ref="chat-scrollbar">
+            <ul ref="chat-ul">
+              <li v-for="item in items" :key="item.messageId" :class="item.messageDirection === 1? 'chat-reply':'chat-question'">
+                <div :class="item.messageDirection === 1? 'reply-info':'question-info'">
+                  <div v-html="item.html? item.html : item.content || ''" :class="item.messageDirection === 1? 'reply-info-content':'question-info-content'"></div>
                 </div>
               </li>
             </ul>
@@ -32,6 +32,7 @@ import * as marked from "marked";
 import hljs from "highlight.js";
 import qs from "qs";
 import ChatGPTSidebar from "@/components/ChatGPTSidebar";
+import {doPost} from "@/axios/httpRequest";
 
 // 设置 marked 的选项及配置
 marked.setOptions({
@@ -59,10 +60,29 @@ export default {
   },
 
   methods: {
+    // 滚动条滑至底部
+    scrollToBottom() {
+      this.$nextTick(() => {
+        this.$refs["chat-scrollbar"].setScrollTop(this.$refs["chat-ul"].clientHeight)
+      });
+    },
+
     // 处理子组件传递过来的参数
-    handleDataFromChild(messageList) {
-      this.items = messageList; // 更新父组件的数据
-      console.log(messageList);
+    updateMessageList(messageList) {
+      if(messageList) {
+        messageList.forEach(message => {
+          let words = message.content.split('');
+          let html = words.join('');
+          message.html = marked.parse(html);
+        })
+      }
+      // 更新父组件的数据
+      this.items = messageList;
+      this.scrollToBottom();
+    },
+
+    updateConversationId(conversationId) {
+        this.conversationId = conversationId;
     },
 
     // 阻止 el-input 回车的默认行为
@@ -80,13 +100,13 @@ export default {
         return v.toString(16);
       })
     },
+
     getUser() {
       return localStorage.getItem("user")
     },
-    onSendMessage() {
-      let this_ = this;
 
-      console.log("message: ",this.message);
+    async onSendMessage() {
+      let this_ = this;
 
       // 发送消息为空
       if(!this.message) {
@@ -110,14 +130,44 @@ export default {
 
       this.generating = true;
 
-      this_.items.push({messageDirection: 'user', message: this_.message});
+      // 提问内容格式化
+      const question = {
+        "messageId": "",
+        "messageDirection": 0,
+        "conversationId": "",
+        "content": this.message,
+        "createTime": 0
+      }
 
-      this.onGetMessage();
+      let words = question.content.split('');
+      let html = words.join('');
+      question.html = marked.parse(html);
+
+      this_.items.push(question);
+
+      // 获取 conversationId
+      // 创建新会话
+      if(!this_.conversationId) {
+        await doPost("/v1/chatgpt/createConversation", {conversationType: 0, conversationName: "新建会话"}).then(response => {
+          if (response && response.data.code === 200) {
+            this.conversationId = response.data.conversationId;
+          } else {
+            this.$message({
+              type: "error",
+              center: true,
+              message: response.data.msg
+            });
+          }
+        });
+      }
+
+      await this.onGetMessage();
     },
-    onGetMessage() {
+
+    async onGetMessage() {
       let this_ = this;
 
-      const data = {usePublicApi: this_.usePublicApi,prompt: this_.message,conversationId: "85cc382d39354804b72ae211122042d5"};
+      const data = {usePublicApi: this_.usePublicApi,prompt: this_.message,conversationId: this_.conversationId};
       const requestData = qs.stringify(data);
 
       console.log(requestData);
@@ -128,7 +178,13 @@ export default {
         console.log('open');
         this_.generating = true;
         this_.message = "";
-        this_.items.push({user: 'bot', message: ''});
+        this_.items.push({
+          "messageId": "",
+          "messageDirection": 1,
+          "conversationId": "",
+          "content": "",
+          "createTime": 0
+        });
       }));
 
       sse.addEventListener("message",function (event) {
@@ -138,11 +194,10 @@ export default {
           return;
         }
         let answer = JSON.parse(event.data).content;
-        console.log(answer);
 
         let last = this_.items[this_.items.length - 1];
-        last.message += answer;
-        let words = last.message.split('');
+        last.content += answer;
+        let words = last.content.split('');
         let html = words.join('');
         last.html = marked.parse(html);
       });
@@ -161,10 +216,11 @@ export default {
 
         setTimeout(() => {
           this_.generating = false;
-        },10000);
+        },5000);
       });
     }
   },
+
   mounted() {
     console.log('mounted')
     let user = this.getUser();
