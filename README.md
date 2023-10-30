@@ -3,3 +3,5 @@
 ![image](https://github.com/Mrying0823/chat/assets/111051660/511f398b-f523-49ce-b18d-e567780afb4a)
 
 2023/10/27 完成 chatgpt 的记忆功能
+
+2023/10/30 完成会话列表创建新会话、切换会话、对话消息展示
