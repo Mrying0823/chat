@@ -30,6 +30,9 @@ import java.util.List;
 @Service("chatgptService")
 public class ChatgptServiceImpl implements ChatgptService {
 
+    // 上一个消息的时间戳
+    private long lastMessageTimestamp = 0;
+
     private ChatgptConfiguration chatgptConfiguration;
 
     private UserMapper userMapper;
@@ -76,7 +79,16 @@ public class ChatgptServiceImpl implements ChatgptService {
         message.setMessageId(UUIDUtils.getUUID());
         message.setMessageDirection(messageDirection);
         message.setContent(msg);
-        message.setCreateTime(new Date());
+
+        // 获取当前时间的秒数
+        long currentTimestamp = System.currentTimeMillis() / 1000;
+        if (currentTimestamp <= lastMessageTimestamp) {
+            // 如果新消息的时间戳与上一条消息的时间戳相同或更小，添加一个小的偏移量（例如1秒）
+            currentTimestamp = lastMessageTimestamp + 1;
+        }
+
+        message.setCreateTime(new Date(currentTimestamp * 1000)); // 转回毫秒级时间戳
+        lastMessageTimestamp = currentTimestamp;
 
         if(conversationId != null) {
             message.setConversationId(conversationId);
@@ -146,7 +158,7 @@ public class ChatgptServiceImpl implements ChatgptService {
         // 7、设置完成时的回调函数
         listener.setOnComplete(msg -> {
             // 保存历史信息
-            saveCurrentMessage(conversationId,prompt, Constants.DIRECTION_QUESTION);
+            saveCurrentMessage(conversationId,prompt,Constants.DIRECTION_QUESTION);
             saveCurrentMessage(conversationId,msg, Constants.DIRECTION_ANSWER);
 
             if(usePublicApi) {

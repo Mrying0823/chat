@@ -40,6 +40,8 @@ public class ConversationController extends BaseController {
         if (conversationId != null) {
             respResult = RespResult.ok();
             respResult.setConversationId(conversationId);
+        }else {
+            respResult.setMsg("服务繁忙，请稍后重试");
         }
 
         return respResult;

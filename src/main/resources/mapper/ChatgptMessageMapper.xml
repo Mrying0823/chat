@@ -115,6 +115,6 @@
     <include refid="Base_Column_List" />
     from blog_chatgpt_message
     where conversation_id = #{conversationId,jdbcType=VARCHAR}
-    order by create_time desc
+    order by create_time asc
   </select>
 </mapper>

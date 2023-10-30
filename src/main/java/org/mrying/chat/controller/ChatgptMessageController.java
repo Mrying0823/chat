@@ -23,7 +23,7 @@ public class ChatgptMessageController extends BaseController {
 
     // 根据 conversationId 查询某个会话的所有对话
     @ApiOperation(value = "查询 chatgpt 对话信息",notes = "根据 conversationId 查询某个会话的所有对话")
-    @ApiImplicitParam(name = "conversationId",value = "会话 Id")
+    @ApiImplicitParam(name = "conversationId",value = "会话 Id",required = true)
     @PostMapping("/chatgpt/getMessages")
     public RespResult queryMessagesByConversationId(@RequestParam("conversationId") String conversationId) {
         RespResult respResult = RespResult.fail();
@@ -33,6 +33,8 @@ public class ChatgptMessageController extends BaseController {
         if (!messageList.isEmpty()) {
             respResult = RespResult.ok();
             respResult.setList(messageList);
+        }else {
+            respResult.setMsg("服务繁忙，请稍后重试");
         }
 
         return respResult;
