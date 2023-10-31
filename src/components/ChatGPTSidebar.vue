@@ -1,13 +1,27 @@
 <template>
   <div class="sidebar">
     <!-- 新会话按钮 -->
-    <el-button class="create-btn" @click="createConversation" size="large">新建会话</el-button>
+    <el-button class="create-btn" @click="createConversation" size="large">
+        <el-icon><Plus /></el-icon>
+        新建会话
+    </el-button>
 
     <!-- 会话列表 -->
     <el-scrollbar class="conversation-list">
       <ul class="conversation-ul">
         <li v-for="conversation in conversationList" :key="conversation.conversationId">
-          <div class="conversation" v-html="conversation.conversationName" @click="selectConversation(conversation.conversationId)" :class="{'conversation-active':selectedConversationIndex === conversation.conversationId}"></div>
+          <div class="conversation" @click="selectConversation(conversation.conversationId)" :class="{'conversation-active':selectedConversationIndex === conversation.conversationId}">
+            <el-icon class="icon-chat-round" v-if="!editConfirm || !deleteConfirm"><ChatRound /></el-icon>
+            <el-icon class="icon-chat-round" v-else-if="editConfirm && selectedConversationIndex === conversation.conversationId"><EditPen /></el-icon>
+            <el-icon class="icon-chat-round" v-else-if="deleteConfirm && selectedConversationIndex === conversation.conversationId"><Delete /></el-icon>
+            <span v-html="conversation.conversationName"></span>
+            <el-input class="input-edit-name" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm"></el-input>
+            <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" @click.stop="editClick" v-show="!deleteConfirm && !editConfirm"><EditPen /></el-icon>
+            <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" v-show="deleteConfirm" @click.stop="deleteConversation(conversation.conversationId)"><Check /></el-icon>
+            <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm" @click.stop="editConversationName(conversation.conversationId)"><Check /></el-icon>
+            <el-icon class="icon-delete" v-if="selectedConversationIndex === conversation.conversationId" v-show="!deleteConfirm && !editConfirm" @click.stop="deleteClick"><Delete /></el-icon>
+            <el-icon class="icon-delete" v-if="selectedConversationIndex === conversation.conversationId" v-show="deleteConfirm || editConfirm" @click.stop="repeatClick"><Close /></el-icon>
+          </div>
         </li>
       </ul>
     </el-scrollbar>
@@ -25,24 +39,41 @@ export default {
   watch: {
     conversationId: {
       handler(newMessage) {
-        // 执行额外的操作，例如转换文本，然后将结果保存在 otherVariable 中
-        if(!this.conversationList[0].conversationId) {
-          this.conversationList[0].conversationId = newMessage;
-          this.selectConversation(newMessage);
+
+        // 服务器端传来了新的 conversationId
+        if(this.selectedConversationIndex !== newMessage) {
+
+          this.newConversation.conversationId = newMessage;
+
+          // 使用unshift方法将新会话添加到列表的首位
+          this.conversationList.unshift(this.newConversation);
+
+          this.selectConversation(this.conversationList[0].conversationId);
         }
       },
-      immediate: true, // 这个选项可以在组件初始化时立即触发观察者
+      // 这个选项可以在组件初始化时立即触发观察者
+      immediate: true,
     }
   },
 
   data() {
     return {
+      editConfirm: false,
+      deleteConfirm: false,
+      newConversation: {
+        conversationId: "",
+        userId: "",
+        conversationType: 0,
+        createTime: 0,
+        conversationName: "新建会话",
+        firstMessage: ""
+      },
       conversationList: [{
         conversationId: "",
         userId: "",
         conversationType: 0,
         createTime: 0,
-        conversationName: "",
+        conversationName: "新建会话",
         firstMessage: ""
       }],
       messageList: [{
@@ -52,11 +83,39 @@ export default {
         "content": "",
         "createTime": 0
       }],
-      selectedConversationIndex: null,
+      selectedConversationIndex: "",
     };
   },
   methods: {
+    // 取消编辑或删除操作
+    repeatClick() {
+      if(this.editConfirm) {
+        this.editConfirm = !this.editConfirm;
+      }
+
+      if(this.deleteConfirm) {
+        this.deleteConfirm = !this.deleteConfirm;
+      }
+    },
+    editClick() {
+      this.editConfirm = true;
+    },
+    deleteConversation(index) {
+      doPost("/v1/chatgpt/deleteConversation",{conversationId: index}).then(response => {
+        if(response && response.data.code === 200) {
+
+          // 从 conversationList 中过滤掉对应的会话
+          this.conversationList = this.conversationList.filter(conversation => conversation.conversationId !== index);
+
+          this.selectConversation("");
+        }
+      });
+    },
+    deleteClick() {
+      this.deleteConfirm = true;
+    },
     selectConversation(index) {
+
       this.selectedConversationIndex = index;
 
       this.$emit("tran-conversationId",index);
@@ -67,18 +126,15 @@ export default {
             this.messageList = response.data.list;
 
             this.$emit("tran-messageList",this.messageList);
-          }else {
-            this.$message({
-              type: "error",
-              center: true,
-              message: response.data.msg
-            });
           }
         });
       }else {
         // 新建会话
         this.$emit("tran-messageList",[]);
       }
+
+      // 切换会话重置删除图标
+      this.deleteConfirm = false;
     },
     createConversation(event) {
       // 使按钮失焦
@@ -88,44 +144,8 @@ export default {
       }
       target.blur()
 
-      // 遍历会话列表，查找是否已经存在 conversationId 为空的会话
-      let conversationExists = false;
-
-      for (let i = 0; i < this.conversationList.length; i++) {
-        if (this.conversationList[i].conversationId === "") {
-          conversationExists = true;
-          this.$message({
-            type: "warning",
-            center: true,
-            message: "不可重复创建空会话"
-          });
-        }
-      }
-
-      // 如果不存在，将新建的会话添加到列表中
-      if (!conversationExists) {
-        // 创建新会话并添加到 conversations 数组
-        const newConversation = {
-          conversationId: "",
-          userId: "",
-          conversationType: 0,
-          createTime: 0,
-          conversationName: "新建会话",
-          firstMessage: ""
-        };
-
-        // 使用unshift方法将新会话添加到列表的首位
-        this.conversationList.unshift(newConversation);
-
-        // 自动选择新会话
-        this.selectConversation("");
-
-        this.$message({
-          type: "info",
-          center: true,
-          message: "请开始对话吧！"
-        });
-      }
+      // 清屏
+      this.selectConversation("");
     },
   },
   mounted() {
@@ -133,8 +153,6 @@ export default {
       if(response && response.data.code === 200) {
         this.conversationList = response.data.list;
 
-        // 在页面加载完成后，设置 selectedConversationIndex 为第一项的 conversationId
-        this.selectConversation(this.conversationList[0].conversationId);
       }else {
         this.$message({
           type: "info",
