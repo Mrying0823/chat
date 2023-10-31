@@ -33,8 +33,6 @@ public class ChatgptMessageController extends BaseController {
         if (!messageList.isEmpty()) {
             respResult = RespResult.ok();
             respResult.setList(messageList);
-        }else {
-            respResult.setMsg("服务繁忙，请稍后重试");
         }
 
         return respResult;

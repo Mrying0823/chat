@@ -117,4 +117,10 @@
     where conversation_id = #{conversationId,jdbcType=VARCHAR}
     order by create_time asc
   </select>
+
+  <!-- 根据 conversationId 删除 chatgpt 会话及会话内容 -->
+  <delete id="deleteMessageByConversationId" parameterType="java.lang.String">
+    delete from blog_chatgpt_message
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

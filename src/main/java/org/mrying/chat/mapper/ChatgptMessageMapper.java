@@ -19,5 +19,8 @@ public interface ChatgptMessageMapper {
     List<ChatgptMessage> selectMessagesByConversationId(@Param("conversationId") String conversationId, @Param("limit") Integer limit);
 
     // 根据 conversationId 查询某个会话的所有对话
-    List<ChatgptMessage> selectAllMessagesByConversationId(@Param("conversationId") String conversationId);
+    List<ChatgptMessage> selectAllMessagesByConversationId(String conversationId);
+
+    // 根据 conversationId 删除 chatgpt 会话及会话内容
+    int deleteMessageByConversationId(String conversationId);
 }

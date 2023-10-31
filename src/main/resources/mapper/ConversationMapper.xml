@@ -80,7 +80,6 @@
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where conversation_id = #{conversationId,jdbcType=VARCHAR}
   </update>
-
   <insert id="insertNewConversation" parameterType="org.mrying.chat.model.Conversation">
     insert into blog_conversation (conversation_id, user_id, conversation_type,
                                    create_time,conversation_name)
@@ -96,4 +95,17 @@
     where user_id = #{userId,jdbcType=VARCHAR}
     order by create_time desc
   </select>
+
+  <!-- 根据会话 id 删除 chatgpt 会话及会话内容 -->
+  <delete id="deleteConversationById" parameterType="java.lang.String">
+    delete from blog_conversation
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+  </delete>
+
+  <!-- 根据 conversationId 查询会话并修改名称 -->
+  <update id="updateConversationNameById">
+    update blog_conversation
+    set conversation_Name = #{conversationName,jdbcType=VARCHAR}
+    where conversation_id = #{conversationId,jdbcType=VARCHAR}
+  </update>
 </mapper>
