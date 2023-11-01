@@ -14,12 +14,18 @@
             <el-icon class="icon-chat-round" v-if="!editConfirm || !deleteConfirm"><ChatRound /></el-icon>
             <el-icon class="icon-chat-round" v-else-if="editConfirm && selectedConversationIndex === conversation.conversationId"><EditPen /></el-icon>
             <el-icon class="icon-chat-round" v-else-if="deleteConfirm && selectedConversationIndex === conversation.conversationId"><Delete /></el-icon>
-            <span v-html="conversation.conversationName"></span>
-            <el-input class="input-edit-name" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm"></el-input>
-            <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" @click.stop="editClick" v-show="!deleteConfirm && !editConfirm"><EditPen /></el-icon>
+            <span class="span-conversation-name-length" v-html="conversation.conversationName"></span>
+            <!-- 会话名称修改输入框 -->
+            <el-input class="input-edit-name" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm" v-model="editedName"></el-input>
+            <!-- 编辑图标 -->
+            <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" @click.stop="editClick(conversation.conversationName)" v-show="!deleteConfirm && !editConfirm"><EditPen /></el-icon>
+            <!-- 保存修改 -->
+            <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm" @click.stop="editConversationName(conversation.conversationId,conversation.conversationName)"><Check /></el-icon>
+            <!-- 删除图标 -->
             <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" v-show="deleteConfirm" @click.stop="deleteConversation(conversation.conversationId)"><Check /></el-icon>
-            <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm" @click.stop="editConversationName(conversation.conversationId)"><Check /></el-icon>
+            <!-- 确认删除 -->
             <el-icon class="icon-delete" v-if="selectedConversationIndex === conversation.conversationId" v-show="!deleteConfirm && !editConfirm" @click.stop="deleteClick"><Delete /></el-icon>
+            <!-- 取消操作 -->
             <el-icon class="icon-delete" v-if="selectedConversationIndex === conversation.conversationId" v-show="deleteConfirm || editConfirm" @click.stop="repeatClick"><Close /></el-icon>
           </div>
         </li>
@@ -43,10 +49,19 @@ export default {
         // 服务器端传来了新的 conversationId
         if(this.selectedConversationIndex !== newMessage) {
 
-          this.newConversation.conversationId = newMessage;
+          const newConversation = {
+            conversationId: "",
+            userId: "",
+            conversationType: 0,
+            createTime: 0,
+            conversationName: "新建会话",
+            firstMessage: ""
+          }
+
+          newConversation.conversationId = newMessage;
 
           // 使用unshift方法将新会话添加到列表的首位
-          this.conversationList.unshift(this.newConversation);
+          this.conversationList.unshift(newConversation);
 
           this.selectConversation(this.conversationList[0].conversationId);
         }
@@ -58,16 +73,10 @@ export default {
 
   data() {
     return {
+      // 会话修改后的名称
+      editedName: "",
       editConfirm: false,
       deleteConfirm: false,
-      newConversation: {
-        conversationId: "",
-        userId: "",
-        conversationType: 0,
-        createTime: 0,
-        conversationName: "新建会话",
-        firstMessage: ""
-      },
       conversationList: [{
         conversationId: "",
         userId: "",
@@ -87,6 +96,35 @@ export default {
     };
   },
   methods: {
+    // 修改会话名称
+    editConversationName(index,currentName) {
+      let this_ = this;
+
+      if(currentName === this_.editedName) {
+        this_.repeatClick();
+        return;
+      }
+
+      if(this_.editedName && index) {
+        doPost("/v1/chatgpt/editConversationName",{conversationId:index,conversationName: this_.editedName}).then(response => {
+          if(response && response.data.code === 200) {
+            this_.conversationList.forEach(function (conversation) {
+              if(conversation.conversationId === index) {
+                conversation.conversationName = this_.editedName;
+              }
+            })
+          }
+        });
+      }else {
+        this_.repeatClick();
+        this_.$message({
+          type: "error",
+          center: true,
+          message: "会话名称不为空"
+        })
+      }
+      this_.repeatClick();
+    },
     // 取消编辑或删除操作
     repeatClick() {
       if(this.editConfirm) {
@@ -97,9 +135,13 @@ export default {
         this.deleteConfirm = !this.deleteConfirm;
       }
     },
-    editClick() {
+    // 点击编辑图标
+    editClick(currentName) {
+      // 获取当前会话名称
+      this.editedName = currentName;
       this.editConfirm = true;
     },
+    // 删除会话
     deleteConversation(index) {
       doPost("/v1/chatgpt/deleteConversation",{conversationId: index}).then(response => {
         if(response && response.data.code === 200) {
@@ -111,9 +153,11 @@ export default {
         }
       });
     },
+    // 点击删除图标
     deleteClick() {
       this.deleteConfirm = true;
     },
+    // 切换会话
     selectConversation(index) {
 
       this.selectedConversationIndex = index;
@@ -133,7 +177,7 @@ export default {
         this.$emit("tran-messageList",[]);
       }
 
-      // 切换会话重置删除图标
+      // 自动切换会话重置删除图标
       this.deleteConfirm = false;
     },
     createConversation(event) {
