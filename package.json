@@ -18,7 +18,8 @@
     "marked": "^7.0.2",
     "marked-highlight": "^2.0.6",
     "qs": "^6.11.2",
-    "sass": "^1.64.1",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^10.0.1",
     "sse": "0.0.8",
     "vue": "^3.2.36",
     "vue-router": "^4.0.3"

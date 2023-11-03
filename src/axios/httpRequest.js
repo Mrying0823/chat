@@ -29,7 +29,8 @@ function doPost(url,data) {
     return axios({
         url: url,
         method: "post",
-        data: requestData
+        data: requestData,
+        timeout: -1
     })
 }
 

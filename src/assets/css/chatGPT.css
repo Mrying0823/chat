@@ -93,6 +93,7 @@
 
 .chat-input {
     cursor: pointer;
+    user-select: none; /* 不显示输入光标 */
     background: whitesmoke;
     display: flex;
     align-items: center;
