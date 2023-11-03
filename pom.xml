@@ -35,6 +35,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- redis 起步依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!-- Spring Boot 的配置处理器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
