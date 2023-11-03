@@ -4,9 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.mrying.chat.view.RespResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,5 +47,41 @@ public class ChatgptController extends BaseController {
         String prompt = map.get("prompt");
 
         return chatgptService.sendMsgBySse(usePublicApi,conversationId,prompt);
+    }
+
+    // 根据用户给的提示，chatgpt 生成 5 条相关问题
+    @ApiOperation(value = "chatgpt 生成问题",notes = "根据用户给的提示，chatgpt 生成 10 条相关问题")
+    @ApiImplicitParam(name = "prompt", value = "提示", required = true)
+    @PostMapping(path = "/chatgpt/chatList")
+    public RespResult chatList(@RequestParam("prompt") String prompt) {
+
+        RespResult respResult = RespResult.fail();
+
+        List<String> chatList = chatgptService.queryQuestionByChatgpt(prompt);
+
+        if(chatList != null) {
+            respResult = RespResult.ok();
+            respResult.setList(chatList);
+        }
+
+        return respResult;
+    }
+
+    // 根据用户给的提示，chatgpt 生成 5 条更专业的问题
+    @ApiOperation(value = "chatgpt 生成专业问题",notes = "根据用户给的提示，chatgpt 生成 10 条更专业的问题")
+    @ApiImplicitParam(name = "prompt", value = "提示", required = true)
+    @PostMapping(path = "/chatgpt/refreshChatList")
+    public RespResult refreshChatList(@RequestParam("prompt") String prompt) {
+
+        RespResult respResult = RespResult.fail();
+
+        List<String> chatList = chatgptService.refreshQuestionByChatgpt(prompt);
+
+        if(chatList != null) {
+            respResult = RespResult.ok();
+            respResult.setList(chatList);
+        }
+
+        return respResult;
     }
 }

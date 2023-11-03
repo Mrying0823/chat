@@ -1,10 +1,13 @@
 package org.mrying.chat.service.impl;
 
+import com.plexpt.chatgpt.ChatGPT;
 import com.plexpt.chatgpt.ChatGPTStream;
 import com.plexpt.chatgpt.entity.chat.ChatCompletion;
+import com.plexpt.chatgpt.entity.chat.ChatCompletionResponse;
 import com.plexpt.chatgpt.entity.chat.Message;
 import com.plexpt.chatgpt.util.SseHelper;
 import org.mrying.chat.constants.Constants;
+import org.mrying.chat.constants.RedisKey;
 import org.mrying.chat.event.GptEventSourceListener;
 import org.mrying.chat.exception.NoTokenCountException;
 import org.mrying.chat.mapper.ChatgptMessageMapper;
@@ -15,6 +18,7 @@ import org.mrying.chat.service.ChatgptService;
 import org.mrying.chat.settings.ChatgptConfiguration;
 import org.mrying.chat.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -22,6 +26,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author 邓和颖
@@ -29,6 +35,8 @@ import java.util.List;
  */
 @Service("chatgptService")
 public class ChatgptServiceImpl implements ChatgptService {
+
+    private StringRedisTemplate stringRedisTemplate;
 
     // 上一个消息的时间戳
     private long lastMessageTimestamp = 0;
@@ -52,6 +60,11 @@ public class ChatgptServiceImpl implements ChatgptService {
     @Autowired
     public void setChatgptConfiguration(ChatgptConfiguration chatgptConfiguration) {
         this.chatgptConfiguration = chatgptConfiguration;
+    }
+
+    @Autowired
+    public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     // 将 ChatgptMessage 转为 SDK(Software Development Kit) 所需的 Message 格式
@@ -176,5 +189,129 @@ public class ChatgptServiceImpl implements ChatgptService {
         chatGPTStream.streamChatCompletion(chatCompletion,listener);
 
         return sseEmitter;
+    }
+
+    // 将问题从信息中分离出来
+    public List<String> extractQuestions(String text) {
+        List<String> questions = new ArrayList<>();
+        int startIndex = 0;
+
+        while (startIndex < text.length()) {
+            int dotIndex = text.indexOf(".", startIndex);
+            if (dotIndex == -1) {
+                break;
+            }
+
+            int questionStartIndex = dotIndex + 1;
+            int questionEndIndex = text.indexOf("\n", questionStartIndex);
+
+            if (questionEndIndex == -1) {
+                questionEndIndex = text.length();
+            }
+
+            String question = text.substring(questionStartIndex, questionEndIndex).trim();
+            questions.add(question);
+
+            startIndex = questionEndIndex + 1;
+        }
+
+        return questions;
+    }
+
+    private ChatCompletionResponse postChatgpt(List<Message> messages) {
+        ChatGPT chatGPT = ChatGPT.builder()
+                .apiKey(chatgptConfiguration.getGptKey())
+                .timeout(900)
+                .apiHost(chatgptConfiguration.getHost())
+                .build()
+                .init();
+
+        ChatCompletion chatCompletion = ChatCompletion.builder()
+                .model(ChatCompletion.Model.GPT_3_5_TURBO.getName())
+                .messages(messages)
+                .maxTokens(3000)
+                .temperature(0.9)
+                .build();
+
+        return chatGPT.chatCompletion(chatCompletion);
+    }
+
+    // 根据用户给的提示，chatgpt 生成 5 条相关问题
+    @Override
+    public List<String> queryQuestionByChatgpt(String prompt) {
+
+        // 查询用户
+        User user = userMapper.selectUserById("34382773848d4c86acb1f960c4681530");
+
+        String key = RedisKey.KEY_USER_QUESTION.concat(user.getUserId()).concat(prompt);
+
+        prompt = prompt.concat("，请给出 5 条相关问题");
+
+        // 问题列表
+        List<String> questions;
+
+        if(Objects.requireNonNull(stringRedisTemplate.opsForList().range(key, 0, -1)).isEmpty()) {
+            List<Message> messages = new ArrayList<>();
+
+            Message message = Message.of(prompt);
+            messages.add(message);
+
+            ChatCompletionResponse response = postChatgpt(messages);
+
+            Message res = response.getChoices().get(0).getMessage();
+
+            // 问题列表
+            questions = extractQuestions(res.getContent());
+
+            stringRedisTemplate.opsForList().leftPushAll(key,questions.toArray(new String[0]));
+            stringRedisTemplate.expire(key,1, TimeUnit.HOURS);
+        }else {
+            // 问题列表
+            questions = stringRedisTemplate.opsForList().range(key, 0, 10);
+        }
+        return questions;
+    }
+
+    // 根据用户给的提示，chatgpt 生成 5 条更专业的问题
+    @Override
+    public List<String> refreshQuestionByChatgpt(String prompt) {
+        // 查询用户
+        User user = userMapper.selectUserById("34382773848d4c86acb1f960c4681530");
+
+        String key = RedisKey.KEY_USER_QUESTION.concat(user.getUserId()).concat(prompt);
+
+        prompt = prompt.concat("，请给出 5 条相关问题");
+
+        // 问题列表
+        List<String> questions;
+
+        List<Message> messages = new ArrayList<>();
+
+        List<String> redisQuestioList = stringRedisTemplate.opsForList().range(key,0,-1);
+
+        if (redisQuestioList != null) {
+            for (String question : redisQuestioList) {
+                // 加入上下文消息列表
+                messages.add(
+                        // gpt 发送的消息
+                        Message.ofAssistant(question)
+                );
+            }
+        }
+
+        Message message = Message.of(prompt);
+        messages.add(message);
+
+        ChatCompletionResponse response = postChatgpt(messages);
+
+        Message res = response.getChoices().get(0).getMessage();
+
+        // 问题列表
+        questions = extractQuestions(res.getContent());
+
+        stringRedisTemplate.opsForList().leftPushAll(key,questions.toArray(new String[0]));
+        stringRedisTemplate.expire(key,1, TimeUnit.HOURS);
+
+        return questions;
     }
 }

@@ -86,8 +86,8 @@ public class ConversationController extends BaseController {
     // 修改会话名称
     @ApiOperation(value = "修改 chatgpt 会话名称",notes = "根据 conversationId 查询会话并修改名称")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "conversationId",value = "会话 Id"),
-            @ApiImplicitParam(name = "conversationName",value = "会话名称")
+            @ApiImplicitParam(name = "conversationId",value = "会话 Id",required = true),
+            @ApiImplicitParam(name = "conversationName",value = "会话名称",required = true)
     })
     @PostMapping("/chatgpt/editConversationName")
     public RespResult editConversationName(@RequestParam("conversationId") String conversationId,
