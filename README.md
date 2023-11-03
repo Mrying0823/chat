@@ -7,4 +7,5 @@
 2023/10/30 完成会话列表创建新会话、切换会话、对话消息展示
 
 2023/11/01 大体完成 chatgpt 会话界面的基本操作（对话，创建、切换、编辑、删除会话）
-![img.png](img.png)
+![image](https://github.com/Mrying0823/chat/assets/111051660/df8dcc8e-d946-45d2-9e93-86fadbf16047)
+
