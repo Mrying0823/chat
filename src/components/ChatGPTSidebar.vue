@@ -196,7 +196,6 @@ export default {
     toGet("/v1/chatgpt/getConversation").then(response => {
       if(response && response.data.code === 200) {
         this.conversationList = response.data.list;
-
       }else {
         this.$message({
           type: "info",

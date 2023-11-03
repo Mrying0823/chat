@@ -1,4 +1,5 @@
 <template>
+  <FloatNavbar @tran-question="sendQuestion"></FloatNavbar>
   <el-container class="chat-container">
     <el-aside class="chat-aside">
       <ChatGPTSidebar @tran-messageList="updateMessageList" @tran-conversationId="updateConversationId" :conversationId="conversationId"></ChatGPTSidebar>
@@ -18,7 +19,7 @@
         <el-footer class="chat-footer">
           <div class="chat-input borderNone">
             <el-input class="message-input" type="textarea" v-model="message" @keydown="handleKeyDown" placeholder="请输入您的消息..." :autosize="{ minRows: 1, maxRows: 2}"></el-input>
-            <el-button type="text" @click="onSendMessage" :disabled="generating" :loading="generating"><el-icon v-show="!generating"><Position /></el-icon></el-button>
+            <el-button type="text" @click="onSendMessage(message)" :disabled="generating" :loading="generating"><el-icon v-show="!generating"><Position /></el-icon></el-button>
           </div>
         </el-footer>
       </el-container>
@@ -33,6 +34,7 @@ import hljs from "highlight.js";
 import qs from "qs";
 import ChatGPTSidebar from "@/components/ChatGPTSidebar";
 import {doPost} from "@/axios/httpRequest";
+import FloatNavbar from "@/components/FloatNavbar";
 
 // 设置 marked 的选项及配置
 marked.setOptions({
@@ -47,7 +49,7 @@ marked.setOptions({
 
 export default {
   name: "ChatGPT",
-  components: {ChatGPTSidebar},
+  components: {FloatNavbar, ChatGPTSidebar},
   data() {
     return {
       // 提问
@@ -60,6 +62,13 @@ export default {
   },
 
   methods: {
+    // 发送问题列表里的问题
+    sendQuestion(question) {
+      if(question) {
+        this.onSendMessage(question);
+      }
+    },
+
     // 滚动条滑至底部
     scrollToBottom() {
       this.$nextTick(() => {
@@ -105,8 +114,12 @@ export default {
       return localStorage.getItem("user")
     },
 
-    async onSendMessage() {
+    async onSendMessage(message) {
       let this_ = this;
+
+      if(message) {
+        this_.message = message;
+      }
 
       // 发送消息为空
       if(!this.message) {
