@@ -255,6 +255,7 @@ public class ChatgptServiceImpl implements ChatgptService {
 
             Message message = Message.of(prompt);
             messages.add(message);
+            messages.add(Message.ofSystem("你是一名教师，你现在要为一个想要提问但是不知道问什么的学生提供相关题目"));
 
             ChatCompletionResponse response = postChatgpt(messages);
 
@@ -301,6 +302,7 @@ public class ChatgptServiceImpl implements ChatgptService {
 
         Message message = Message.of(prompt);
         messages.add(message);
+        messages.add(Message.ofSystem("你是一名教师，你现在要为一个想要提问但是不知道问什么的学生提供相关题目"));
 
         ChatCompletionResponse response = postChatgpt(messages);
 
