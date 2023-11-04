@@ -185,76 +185,10 @@ export default {
 };
 </script>
 <style scoped>
-.callback {
-  position: fixed;
-  right: 79.5%;
-  z-index: 9999;
-}
-
-.callback-grab {
-  cursor: grab;
-}
-
-.float {
-  user-select: none;
-  position: fixed;
-  top: 4.5%;
-  touch-action: none;
-  width: 3vw;
-  height: 3vw;
-  border-radius: 24px;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 10px #ccc;
-}
-
-.float .el-icon {
-  font-size: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  color: #cecece;
-}
-
-.float .el-icon:hover {
-  color: black;
-}
-
-.nav-ul {
-  list-style: none; /* 移除圆点 */
-  padding: 0; /* 移除默认内边距 */
-
-}
-
-.nav-li {
-  cursor: pointer;
-}
-
-.nav-li div {
-  user-select: none;
-}
-
-/* el-divider 修改高度&虚线效果 */
-.el-divider--horizontal{
-  margin: 8px 0;
-  background: 0 0;
-  border-top: 1px dashed #e8eaec;
-}
-
 .borderNone >>>.el-textarea__inner {
   border: 0;
   resize: none;
   box-shadow: 0 0 0 0;
-}
-
-.refresh-icon {
-  color: #cecece;
-  cursor: pointer;
-}
-
-.refresh-icon:hover{
-  color: black;
 }
 </style>
 
