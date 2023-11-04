@@ -1,12 +1,13 @@
 .chat-container {
     width: 100%; /* 设置容器宽度为100% */
-    padding: 20px; /* 设置容器内边距，可以根据需要进行调整 */
     box-sizing: border-box; /* 设置盒模型为border-box，确保内边距和边框不会增加容器的宽度 */
-    height: 97vh;
+    height: 96vh;
+    padding-top: 0.9%;
     border: 1px solid #ccc;
     box-shadow: 2px 2px 10px #ccc;
     font-family: "Source Code Pro Light", sans-serif;
     background: white;
+    position: fixed;
 }
 
 .chat-container-message {

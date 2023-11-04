@@ -1,0 +1,165 @@
+
+/* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+@-webkit-keyframes iconmove {
+from {left:-30px;}
+to {left:0px;}
+}
+/* For Firefox 5.0+ */
+@-moz-keyframes iconmove {
+from {left:-30px;}
+to {left:0px;}
+}
+/* For Opera 12.0+ */
+@-o-keyframes iconmove {
+from {left:-30px;}
+to {left:0px;}
+}
+/* Standard Syntax */
+@keyframes iconmove {
+from {left:-30px;}
+to {left:0px;}
+}
+
+/* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+@-webkit-keyframes dropdown {
+from {
+opacity:0;
+margin-top:100px;
+-webkit-transform:scale(0.5,0.5); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+transform:scale(0.5,0.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+margin-top:0px;
+-webkit-transform:scale(1,1); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+/* For Firefox 5.0+ */
+@-moz-keyframes dropdown {
+from {
+opacity:0;
+margin-top:100px;
+-moz-transform:scale(0.5,0.5); /* For Firefox 3.5+ */
+transform:scale(0.5,0.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+margin-top:0px;
+-moz-transform:scale(1,1); /* For Firefox 3.5+ */
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+/* For Opera 12.0+ */
+@-o-keyframes dropdown {
+from {
+opacity:0;
+margin-top:100px;
+-webkit-transform:scale(0.5,0.5); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+-o-transform:scale(0.5,0.5); /* Opera 10.5, 12.1+ */
+transform:scale(0.5,0.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+margin-top:0px;
+-webkit-transform:scale(1,1); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+-o-transform:scale(1,1); /* Opera 10.5, 12.1+ */
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+/* Standard Syntax */
+@keyframes dropdown {
+from {
+opacity:0;
+margin-top:100px;
+transform:scale(0.5,0.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+margin-top:0px;
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+
+/* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+@-webkit-keyframes subdropdown {
+from {
+opacity:0;
+left:300px;
+-webkit-transform:scale(1.5,1.5); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+transform:scale(1.5,1.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+left:200px;
+-webkit-transform:scale(1,1); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+/* For Firefox 5.0+ */
+@-moz-keyframes subdropdown {
+from {
+opacity:0;
+left:300px;
+-moz-transform:scale(1.5,1.5); /* For Firefox 3.5+ */
+transform:scale(1.5,1.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+left:200px;
+-moz-transform:scale(1,1); /* For Firefox 3.5+ */
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+/* For Opera 12.0+ */
+@-o-keyframes subdropdown {
+from {
+opacity:0;
+left:300px;
+-webkit-transform:scale(1.5,1.5); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+-o-transform:scale(1.5,1.5); /* Opera 10.5, 12.1+ */
+transform:scale(1.5,1.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+left:200px;
+-webkit-transform:scale(1,1); /* For Chrome 4.0+, Safari 3.2+ and Opera 15.0+ */
+-o-transform:scale(1,1); /* Opera 10.5, 12.1+ */
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+/* Standard Syntax */
+@keyframes subdropdown {
+from {
+opacity:0;
+left:300px;
+transform:scale(1.5,1.5); /* Standard Syntax */
+}
+to {
+opacity:1;
+left:200px;
+transform:scale(1,1); /* Standard Syntax */
+}
+}
+
+/* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+@-webkit-keyframes moveright {
+from {right:20px;}
+to {right:5px;}
+}
+/* For Firefox 5.0+ */
+@-moz-keyframes moveright {
+from {right:20px;}
+to {right:5px;}
+}
+/* For Opera 12.0+ */
+@-o-keyframes moveright {
+from {right:20px;}
+to {right:5px;}
+}
+/* Standard Syntax */
+@keyframes moveright {
+from {right:20px;}
+to {right:5px;}
+}
+

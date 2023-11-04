@@ -1,4 +1,5 @@
 <template>
+  <NavBar></NavBar>
   <FloatNavbar @tran-question="sendQuestion"></FloatNavbar>
   <el-container class="chat-container">
     <el-aside class="chat-aside">
@@ -35,6 +36,7 @@ import qs from "qs";
 import ChatGPTSidebar from "@/components/ChatGPTSidebar";
 import {doPost} from "@/axios/httpRequest";
 import FloatNavbar from "@/components/FloatNavbar";
+import NavBar from "@/components/NavBar";
 
 // 设置 marked 的选项及配置
 marked.setOptions({
@@ -49,7 +51,7 @@ marked.setOptions({
 
 export default {
   name: "ChatGPT",
-  components: {FloatNavbar, ChatGPTSidebar},
+  components: {NavBar, FloatNavbar, ChatGPTSidebar},
   data() {
     return {
       // 提问

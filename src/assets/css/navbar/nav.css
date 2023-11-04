@@ -1,0 +1,317 @@
+body { background-color:#fff; } /* For body color */
+
+/* All navigation menus have the same base navbar coding. Different color variations have been grouped into different .navbar files */
+
+/* This is the parent div tag, which is the base of the nav menu */
+.nav {
+    user-select: none;
+    position:fixed;
+    padding:0;
+    width:100%;
+    margin:0 auto;
+    z-index: 999;
+}
+
+/* For nav back, which has been only framed. Color style is present in other navbar files */
+.nav > ul {
+width:100%;
+margin:0px auto;
+padding:0;
+overflow:hidden;
+-webkit-box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1);  /* For Chrome 4.0+ and Safari 3.5 +*/
+-moz-box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1); /* For Firefox 3.5*/
+box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1); /* Standard Syntax*/
+}
+
+/* For main nav menu links frame */
+.nav > ul > li {
+float:left;
+list-style-type:none;
+width:120px;
+} 
+
+/* For framing Home link */
+.nav > ul > li:first-child {
+width:55px;
+}
+
+/* For hidden nav menu link icons */
+.nav > ul > li > a > i {
+visibility:hidden;
+position:relative;
+font-size:16px;
+}
+
+/* For Home link */
+.nav > ul > li:first-child > a > i  {
+visibility:visible;
+}
+
+/* For hiding the links to get icons, on hovering the main nav links */
+.nav > ul > li:hover > a > span {
+visibility:hidden;
+position:absolute;
+}
+
+/* For down arrows, associated with the main nav links which have a sublevel */
+.nav>ul>li>a>span>i {
+font-size:8px;
+position:relative;
+top:-2px;
+}
+
+/* For appearance of icons in place of links on hovering them */
+.nav > ul > li:hover > a > i {
+visibility:visible;
+-webkit-animation:iconmove 0.7s; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-webkit-animation-fill-mode:forwards; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-moz-animation:iconmove 0.7s; /* For Firefox 5.0+ */ 
+-moz-animation-fill-mode:forwards; /* For Firefox 5.0+ */
+-o-animation:iconmove 0.7s; /* For Opera 12.0+ */
+-o-animation-fill-mode:forwards; /* For Opera 12.0+ */
+animation:iconmove 0.7s; /* Standard Syntax */
+animation-fill-mode:forwards; /* Standard Syntax */
+}
+
+/* For excluding Home link from animation */
+.nav > ul > li:first-child:hover > a > i  {
+    -webkit-animation-name:none; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+    -moz-animation-name:none; /* For Firefox 5.0+ */
+    -o-animation-name:none;; /* For Opera 12.0+ */
+    animation-name:none; /* Standard Syntax */
+}
+
+/* For main nav links */
+.nav > ul > li > a  {
+    text-decoration:none;
+    font-family:"Source Code Pro Light sans-serif";
+    font-size:13px;
+    display:block;
+    width:100%;
+    padding:20px 0;
+    text-align:center;
+    -webkit-transition:background 0.5s; /* For Chrome 4.0+ and Safari 3.1 to 6.0 */
+    -moz-transition:background 0.5s; /* For firefox 4.0+ */
+    -o-transition:background 0.5s; /* For Opera 10.5+ */
+    transition:background 0.5s;
+    text-transform:uppercase;
+    letter-spacing:0.7px;
+}
+
+/* For appearance of sublevel (first and so on) menus appear */
+.nav > ul > li > a:hover + .sublevel, .sublevel:hover, .sublevel > li > a:hover + .sublevel{
+display:block;
+}
+
+/* For the effect with which first sublevel menu appear */
+.nav > ul > li > a:hover + .sublevel {
+-webkit-animation:dropdown 0.6s; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-webkit-animation-fill-mode:forwards; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-moz-animation:dropdown 0.6s; /* For Firefox 5.0+ */ 
+-moz-animation-fill-mode:forwards; /* For Firefox 5.0+ */
+-o-animation:dropdown 0.6s; /* For Opera 12.0+ */
+-o-animation-fill-mode:forwards; /* For Opera 12.0+ */
+animation:dropdown 0.6s; /* Standard Syntax */
+animation-fill-mode:forwards; /* Standard Syntax */
+}
+
+/* For the effect with which these sublevel menus appear */
+.sublevel > li > a:hover + .sublevel {
+-webkit-animation:subdropdown 0.6s; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-webkit-animation-fill-mode:forwards; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-moz-animation:subdropdown 0.6s; /* For Firefox 5.0+ */ 
+-moz-animation-fill-mode:forwards; /* For Firefox 5.0+ */
+-o-animation:subdropdown 0.6s; /* For Opera 12.0+ */
+-o-animation-fill-mode:forwards; /* For Opera 12.0+ */
+animation:subdropdown 0.6s; /* Standard Syntax */
+animation-fill-mode:forwards; /* Standard Syntax */
+}
+
+/* For framing each sublevel menu (general) */
+.sublevel {
+display:none;
+position:absolute;
+padding:0px;
+-webkit-box-shadow:0px 0px 1px 1px rgba(0,0,0,0.2); /* For Chrome 4.0 + and Safari 3.5+ */
+-moz-box-shadow:0px 0px 1px 1px rgba(0,0,0,0.2); /* For Firefox 3.5*/
+box-shadow:0px 0px 1px 1px rgba(0,0,0,0.2); /* For Firefox 4+, Opera and IE9 */
+z-index:100;
+}
+
+/* For right arrows, associated with the links of the sublevel menu which itself has a sublevel of menu  */
+.menu > li > a > i {
+position:absolute;
+right:20px;
+font-size:8px;
+margin:5px 0px 0px 0px;
+}
+
+/* For moving arrows, on hovering the links of the sublevel which have another sublevel of menu */
+.menu > li:hover > a > i  {
+-webkit-animation:moveright 0.6s; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-webkit-animation-fill-mode:forwards; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-moz-animation:moveright 0.6s; /* For Firefox 5.0+ */ 
+-moz-animation-fill-mode:forwards; /* For Firefox 5.0+ */
+-o-animation:moveright 0.6s; /* For Opera 12.0+ */
+-o-animation-fill-mode:forwards; /* For Opera 12.0+ */
+animation:moveright 0.6s; /* Standard Syntax */
+animation-fill-mode:forwards; /* Standard Syntax */
+}
+
+/* For framing sublevel menu links */
+.menu > li {
+list-style-type:none;
+width:200px;
+}
+
+/* For sublevel menu links */
+.menu > li >a {
+text-decoration:none;
+font-family:"Source Code Pro Light sans-serif";
+font-size:13px;
+display:block;
+width:100%;
+padding:17px 0px;
+text-align:center;
+-webkit-transition:background 0.6s, color 0.6s; /* For Chrome 4.0+ and Safari 3.1 to 6.0 */
+-moz-transition:background 0.6s; /* For firefox 4.0+ */
+-o-transition:background 0.6s; /* For Opera 10.5+ */
+transition:background 0.6s, color 0.6s;
+letter-spacing:0.3px;
+
+}
+
+/* For sublevel menus after the first level submenu */
+.menu > li > .menu {
+position:absolute;
+left:200px;
+margin-top:-50px;
+}
+
+/* For framing a megamenu */
+.megamenu {
+width:100%;
+background-color:#ffffff;
+position:absolute;
+left:0px;
+margin:0px;
+padding:0px;
+}
+
+/* For different groups of item lists */
+.megamenu>div>ul {
+float:left;
+overflow:hidden;
+padding:5px 0px;
+position:relative;
+width:20%;
+}
+
+/* For framing Items in a group included in megamenu */ 
+.megamenu>div>ul>li {
+text-align:center;
+list-style-type:none;
+}
+
+/* For item links included in megamenu */
+.megamenu>div>ul>li>a {
+display:inline-block;
+padding:10px 20px;
+text-decoration:none;
+color:#888;
+    font-family:"Source Code Pro Light sans-serif";
+font-size:13px;
+letter-spacing:0.5px;
+-webkit-transition:background 0.6s, color 0.6s; /* For Chrome 4.0+ and Safari 3.1 to 6.0 */
+-moz-transition:background 0.6s, color 0.6s; /* For firefox 4.0+ */
+-o-transition:background 0.6s, color 0.6s; /* For Opera 10.5+ */
+transition:background 0.6s, color 0.6s;
+}
+
+/* For group heading in megamenu */
+.megamenu h3 {
+    font-family:"Source Code Pro Light sans-serif";
+font-size:12px;
+letter-spacing:0.5px;
+text-align:center;
+}
+
+/* For the base of different groups in megamenu */
+.holder-1 {
+padding:0px;
+background-color:transparent;
+overflow:hidden;
+width:100%;
+}
+
+/* For the base of the long paragraph in megamenu */
+.holder-2 {
+padding:0px;
+width:100%;
+margin:0px;
+}
+
+/* For the paragraph in megamenu */
+.holder-2>p {
+padding:20px;
+margin:0px;
+letter-spacing:0.7px;
+text-align:justify;
+color:#888888;
+    font-family:"Source Code Pro Light sans-serif";
+font-size:13px;
+line-height:20px;
+}
+
+/* Below is the navbar coding for the Responsive State */
+@media only screen and (max-width:768px) {
+
+/* For framing main nav links */
+.nav>ul>li {
+width:100%;
+clear:both;
+}
+
+/* For framing sublevel menu links */
+.menu>li {
+width:100%;
+}
+
+/* For each sublevel of menu */
+.sublevel {
+width:100%;
+left:0px;
+padding:0px;
+margin:0px;
+}
+
+/* For the effect with which all sublevel (after 1st sublevel) menus appear */
+.nav>ul>li>.sublevel>li:hover .sublevel {
+-webkit-animation:dropdown 0.6s; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-webkit-animation-fill-mode:forwards; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+-moz-animation:dropdown 0.6s; /* For Firefox 5.0+ */ 
+-moz-animation-fill-mode:forwards; /* For Firefox 5.0+ */
+-o-animation:dropdown 0.6s; /* For Opera 12.0+ */
+-o-animation-fill-mode:forwards; /* For Opera 12.0+ */
+animation:dropdown 0.6s; /* Standard Syntax */
+animation-fill-mode:forwards; /* Standard Syntax */
+}
+
+/* For making every sublevel, after first sublevel of menu, appear in a single column   */
+.sublevel>li>.sublevel{
+left:0px;
+margin:0px;
+}
+
+/* For getting different groups of item lists in a single column */
+.megamenu>div>ul {
+clear:both;
+width:100%;
+}
+
+/* For making Home link extend upto 100% width of the nav manu  */
+.nav >ul>li:first-child {
+width:100%;
+}
+
+}
