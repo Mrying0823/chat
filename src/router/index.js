@@ -3,6 +3,7 @@ import GPTWindow from "@/views/GPTWindow";
 import ChatGPT from "@/views/ChatGPT";
 import ChatGPTPost from "@/views/ChatGPTPost";
 import GPTWindow3 from "@/views/GPTWindow3";
+import HomePage from "@/views/HomePage";
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: "/gpt/chatGPTPost",
     name: "ChatGPTPost",
     component: ChatGPTPost
+  },
+  {
+    path: "/",
+    name: "HomePage",
+    component: HomePage
   }
 ]
 
