@@ -45,12 +45,13 @@
     padding: 10px;
     font-size: 14px;
     float: right;
-    color: black;
+    color: #344B47;
     margin-right: 10px;
     position: relative;
     margin-top: 8px;
-    background: whitesmoke;
+    background: #EEFCFC;
     text-align: left;
+    border-radius: 8px;
 }
 
 .question-info-content::after {
@@ -58,7 +59,7 @@
     right: -8px;
     top: 8px;
     content: '';
-    border-left: 10px solid whitesmoke;
+    border-left: 10px solid #EEFCFC;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
 }
@@ -76,10 +77,11 @@
 .reply-info-content {
     padding: 10px;
     font-size: 14px;
-    color: white;
-    background: darkcyan;
+    color: #007561;
+    background: #EEE8A9;
     position: relative;
     margin-top: 8px;
+    border-radius: 8px;
 }
 
 .reply-info-content::before {
@@ -87,7 +89,7 @@
     left: -8px;
     top: 8px;
     content: '';
-    border-right: 10px solid darkcyan;
+    border-right: 10px solid #EEE8A9;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
 }
