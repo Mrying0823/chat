@@ -19,7 +19,7 @@ import '@/assets/css/navbar/animations-3.css'
 import '@/assets/css/navbar/normalize.css'
 import '@/assets/css/navbar/main-versions.css'
 import '@/assets/css/floatNavbar.css'
-
+import particlesJS from "particles.js";
 
 // 创建应用实例
 const app = createApp(App);
@@ -35,5 +35,6 @@ app.use(router);
 // 使用 Vuex
 app.use(Vuex);
 app.use(store);
+app.use(particlesJS);
 // 挂载到 DOM
 app.mount('#app');

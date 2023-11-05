@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import {doPost, toGet} from "@/axios/httpRequest";
+import {doPost} from "@/axios/httpRequest";
 
 export default {
   name: "ChatGPTSidebar",
@@ -164,15 +164,22 @@ export default {
 
       this.$emit("tran-conversationId",index);
 
-      if(index) {
-        doPost("/v1/chatgpt/getMessages",{conversationId: index}).then(response => {
-          if(response && response.data.code === 200) {
-            this.messageList = response.data.list;
+      console.log("running",this.$store.getters.getLastSelectedConversation.selectedConversationIndex);
 
-            this.$emit("tran-messageList",this.messageList);
+      if(index === this.lastSelectedConversation.selectedConversationIndex && this.lastSelectedConversation.messageList) {
+        this.$emit("tran-messageList",this.lastSelectedConversation.messageList);
+      }else if(index) {
+
+        doPost("/v1/chatgpt/getMessages", {conversationId: index}).then(response => {
+          if (response && response.data.code === 200) {
+            this.messageList = response.data.list;
+            // 在组件中触发 mutation 来更新数据
+            this.$store.commit('updateLastSelectedConversation', {selectedConversationIndex: index,messageList: this.messageList});
+            this.$emit("tran-messageList", this.messageList);
           }
         });
       }else {
+
         // 新建会话
         this.$emit("tran-messageList",[]);
       }
@@ -192,18 +199,29 @@ export default {
       this.selectConversation("");
     },
   },
+  computed: {
+    lastSelectedConversation() {
+      return this.$store.getters.getLastSelectedConversation;
+    }
+  },
   mounted() {
-    toGet("/v1/chatgpt/getConversation").then(response => {
-      if(response && response.data.code === 200) {
-        this.conversationList = response.data.list;
-      }else {
-        this.$message({
-          type: "info",
-          center: true,
-          message: response.data.msg
-        });
-      }
-    });
+
+    this.selectConversation(this.$store.getters.getLastSelectedConversation.selectedConversationIndex);
+
+    // 启动计时器
+    this.$store.dispatch('startSessionExpiryTimer');
+
+    // toGet("/v1/chatgpt/getConversation").then(response => {
+    //   if(response && response.data.code === 200) {
+    //     this.conversationList = response.data.list;
+    //   }else {
+    //     this.$message({
+    //       type: "info",
+    //       center: true,
+    //       message: response.data.msg
+    //     });
+    //   }
+    // });
   }
 }
 </script>

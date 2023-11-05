@@ -206,6 +206,8 @@ export default {
         if(event.data === "[DONE]") {
           sse.close();
           this_.generating = false;
+          // 更新 store 数据
+          this_.$store.dispatch('asyncLastSelectedConversation', {selectedConversationIndex: this_.conversationId,messageList: this_.items});
           return;
         }
         let answer = JSON.parse(event.data).content;
