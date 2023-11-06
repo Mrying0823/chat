@@ -20,6 +20,7 @@ import '@/assets/css/navbar/normalize.css'
 import '@/assets/css/navbar/main-versions.css'
 import '@/assets/css/floatNavbar.css'
 import particlesJS from "particles.js";
+import '@/assets/css/homePage.css'
 
 // 创建应用实例
 const app = createApp(App);

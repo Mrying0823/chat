@@ -4,6 +4,7 @@ import ChatGPT from "@/views/ChatGPT";
 import ChatGPTPost from "@/views/ChatGPTPost";
 import GPTWindow3 from "@/views/GPTWindow3";
 import HomePage from "@/views/HomePage";
+import LoginView from "@/views/LoginView";
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: "/",
     name: "HomePage",
     component: HomePage
+  },
+  {
+    path: "/user/login",
+    name: "LoginView",
+    component: LoginView
   }
 ]
 
