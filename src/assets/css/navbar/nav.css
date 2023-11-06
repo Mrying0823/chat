@@ -14,13 +14,13 @@ body { background-color:#fff; } /* For body color */
 
 /* For nav back, which has been only framed. Color style is present in other navbar files */
 .nav > ul {
-width:100%;
-margin:0px auto;
-padding:0;
-overflow:hidden;
--webkit-box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1);  /* For Chrome 4.0+ and Safari 3.5 +*/
--moz-box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1); /* For Firefox 3.5*/
-box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1); /* Standard Syntax*/
+    width:100%;
+    margin:0 auto;
+    padding:0;
+    overflow:hidden;
+    -webkit-box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1);  /* For Chrome 4.0+ and Safari 3.5 +*/
+    -moz-box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1); /* For Firefox 3.5*/
+    box-shadow:1px 1px 1px 1px rgba(0,0,0,0.1); /* Standard Syntax*/
 }
 
 /* For main nav menu links frame */
@@ -266,52 +266,62 @@ line-height:20px;
 /* Below is the navbar coding for the Responsive State */
 @media only screen and (max-width:768px) {
 
-/* For framing main nav links */
-.nav>ul>li {
-width:100%;
-clear:both;
+    /* For framing main nav links */
+    .nav>ul>li {
+    width:100%;
+    clear:both;
+    }
+
+    /* For framing sublevel menu links */
+    .menu>li {
+    width:100%;
+    }
+
+    /* For each sublevel of menu */
+    .sublevel {
+    width:100%;
+    left:0px;
+    padding:0px;
+    margin:0px;
+    }
+
+    /* For the effect with which all sublevel (after 1st sublevel) menus appear */
+    .nav>ul>li>.sublevel>li:hover .sublevel {
+    -webkit-animation:dropdown 0.6s; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+    -webkit-animation-fill-mode:forwards; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
+    -moz-animation:dropdown 0.6s; /* For Firefox 5.0+ */
+    -moz-animation-fill-mode:forwards; /* For Firefox 5.0+ */
+    -o-animation:dropdown 0.6s; /* For Opera 12.0+ */
+    -o-animation-fill-mode:forwards; /* For Opera 12.0+ */
+    animation:dropdown 0.6s; /* Standard Syntax */
+    animation-fill-mode:forwards; /* Standard Syntax */
+    }
+
+    /* For making every sublevel, after first sublevel of menu, appear in a single column   */
+    .sublevel>li>.sublevel{
+    left:0px;
+    margin:0px;
+    }
+
+    /* For getting different groups of item lists in a single column */
+    .megamenu>div>ul {
+    clear:both;
+    width:100%;
+    }
+
+    /* For making Home link extend upto 100% width of the nav manu  */
+    .nav >ul>li:first-child {
+    width:100%;
+    }
 }
 
-/* For framing sublevel menu links */
-.menu>li {
-width:100%;
+.nav-login {
+    position: absolute;
+    right: 0;
 }
 
-/* For each sublevel of menu */
-.sublevel {
-width:100%;
-left:0px;
-padding:0px;
-margin:0px;
-}
-
-/* For the effect with which all sublevel (after 1st sublevel) menus appear */
-.nav>ul>li>.sublevel>li:hover .sublevel {
--webkit-animation:dropdown 0.6s; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
--webkit-animation-fill-mode:forwards; /* For Chrome 4.0+, Safari 4.0+ and Opera 15.0 */
--moz-animation:dropdown 0.6s; /* For Firefox 5.0+ */ 
--moz-animation-fill-mode:forwards; /* For Firefox 5.0+ */
--o-animation:dropdown 0.6s; /* For Opera 12.0+ */
--o-animation-fill-mode:forwards; /* For Opera 12.0+ */
-animation:dropdown 0.6s; /* Standard Syntax */
-animation-fill-mode:forwards; /* Standard Syntax */
-}
-
-/* For making every sublevel, after first sublevel of menu, appear in a single column   */
-.sublevel>li>.sublevel{
-left:0px;
-margin:0px;
-}
-
-/* For getting different groups of item lists in a single column */
-.megamenu>div>ul {
-clear:both;
-width:100%;
-}
-
-/* For making Home link extend upto 100% width of the nav manu  */
-.nav >ul>li:first-child {
-width:100%;
-}
-
+.nav-login-avatar {
+    position: fixed;
+    right: 2.5vw;
+    top: 1.2vh;
 }

@@ -4,7 +4,8 @@ import createPersistedState from "vuex-persistedstate";
 const store = createStore({
     state: {
         user: {
-            name: ''
+            name: "邓和颖",
+            account: "18978955805"
         },
         // 上一次选择的会话
         lastSelectedConversation: {
@@ -46,7 +47,10 @@ const store = createStore({
                 const currentTime = Date.now();
                 if (context.state.sessionExpiryTime && currentTime >= context.state.sessionExpiryTime) {
                     // 会话过期，清除数据
-                    context.commit('updateUser', { name: '' });
+                    context.commit('updateUser', {
+                        name: "邓和颖",
+                        account: "18978955805"
+                    });
                     context.commit('updateSessionExpiryTime', null);
                     context.commit("updateLastSelectedConversation",{
                         selectedConversationIndex: "",
