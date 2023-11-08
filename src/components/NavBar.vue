@@ -33,6 +33,8 @@ export default {
   methods: {
     logout() {
       this.$store.dispatch('asyncClearUser');
+      // 清空本地存储
+      localStorage.clear();
       this.isAvatarShow = false;
     }
   },
