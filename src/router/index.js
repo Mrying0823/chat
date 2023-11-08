@@ -5,6 +5,7 @@ import ChatGPTPost from "@/views/ChatGPTPost";
 import GPTWindow3 from "@/views/GPTWindow3";
 import HomePage from "@/views/HomePage";
 import LoginView from "@/views/LoginView";
+import store from "@/store";
 
 const routes = [
   {
@@ -15,7 +16,10 @@ const routes = [
   {
     path: "/gpt/chatGPT",
     name: "ChatGPT",
-    component: ChatGPT
+    component: ChatGPT,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: "/gpt/gptWindow3",
@@ -43,5 +47,16 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  const phone = store.state.user.phone;
+
+  // 如果路由需要登录且用户未登录，重定向到登录页面
+  if (to.matched.some(record => record.meta.requireAuth) && !phone) {
+    next('/user/login');
+  } else {
+    next();
+  }
+});
 
 export default router
