@@ -5,42 +5,42 @@
       <div id="particles-js"></div>
       <div class="login-child-container">
         <div class="welcome">
-          <div class="pinkbox">
-            <div class="signup nodisplay">
+          <div class="pinkbox" :style="{ transform: `translateX(${boxPosition})` }">
+            <div class="signup" v-show="showSignUp">
               <h1>注册</h1>
-              <form autocomplete="off">
-                <input type="text" placeholder="用户名">
-                <input type="email" placeholder="email">
-                <input type="password" placeholder="密码">
-                <input type="password" placeholder="确认密码">
-                <button class="button submit">创建账号 </button>
+              <form autocomplete="off" @submit.prevent="signUp">
+                <input type="text" placeholder="用户名" v-model="userName">
+                <input type="text" placeholder="手机号码" v-model="userPhone">
+                <input type="password" placeholder="密码" v-model="userPwd">
+                <input type="password" placeholder="确认密码" v-model="userPwdConfirm">
+                <el-button class="button" native-type="submit" :loading="isLoading" size="large">创建账号 </el-button>
               </form>
             </div>
-            <div class="signin">
+            <div class="signin" v-show="showSignIn">
               <h1>登录</h1>
-              <form class="more-padding" autocomplete="off">
-                <input type="text" placeholder="用户名">
-                <input type="password" placeholder="密码">
+              <form class="more-padding" autocomplete="off" @submit.prevent="signIn">
+                <input type="text" placeholder="手机号码" v-model="userPhone">
+                <input type="password" placeholder="密码" v-model="userPwd">
                 <div class="checkbox">
                   <input type="checkbox" id="remember" /><label for="remember">记住我</label>
                 </div>
-                <button class="button submit">登录</button>
+                <el-button class="button" native-type="submit" :loading="isLoading" size="large">登录</el-button>
               </form>
             </div>
           </div>
           <div class="leftbox">
-            <h2 class="title"><span>BLOOM</span>&<br>BOUQUET</h2>
-            <p class="desc">选择你最喜欢的<span>鲜花</span></p>
-            <img class="flower smaller" src="" alt="1357d638624297b" border="0">
+            <h2 class="title"><span>SignUp</span>&<br>Chat</h2>
+            <p class="desc">选择你的<span>登录方式</span></p>
+            <img class="flower smaller" src="../assets/img/手捧脸.png" alt="" border="0">
             <p class="account">已经有账号了?</p>
-            <button class="button" id="signin">登录</button>
+            <button class="button" id="signin" @click="toggleForms">登录</button>
           </div>
           <div class="rightbox">
-            <h2 class="title"><span>BLOOM</span>&<br>BOUQUET</h2>
-            <p class="desc">选择你最喜欢的<span>鲜花</span></p>
-            <img class="flower" src="" />
+            <h2 class="title"><span>SignIn</span>&<br>Chat</h2>
+            <p class="desc">选择你的<span>登录方式</span></p>
+            <img class="flower smaller" src="../assets/img/白发少女.png"  alt=""/>
             <p class="account">还没有账号?</p>
-            <button class="button" id="signup">注册</button>
+            <button class="button" id="signup" @click="toggleForms">注册</button>
           </div>
         </div>
       </div>
@@ -51,10 +51,205 @@
 <script>
 import NavBar from "@/components/NavBar";
 import particlesJson from "@/assets/particles.json";
+import {doPost, toGet} from "@/axios/httpRequest";
+import md5 from "js-md5";
 
 export default {
   name: "LoginView",
   components: {NavBar},
+  data() {
+    return {
+      // 初始位置
+      boxPosition: "0%",
+
+      // 显示登录
+      showSignIn: true,
+
+      // 显示注册
+      showSignUp: false,
+
+      userPhone: "",
+
+      userPwd: "",
+
+      isLoading: false,
+
+      // 手机号码输入错误或未注册
+      isPhoneErrExistSignIn: true,
+
+      // 手机号码输入错误或未注册
+      isPhoneErrExistSignUp: true,
+
+      // 密码输入错误
+      isPwdErrExist: true,
+
+      // 用户名
+      userName: "",
+
+      // 确认密码
+      userPwdConfirm: "",
+
+      // 前后密码确认
+      isPwdConfirm: false,
+
+      // 用户名是否为空
+      isNameBlank: true
+    }
+  },
+  methods: {
+    // 消息提示的方法
+    showMessage(type, message) {
+      this.$message({
+        type: type,
+        center: true,
+        message: message
+      });
+    },
+
+    toggleForms() {
+      this.showSignIn = !this.showSignIn;
+      this.showSignUp = !this.showSignUp;
+
+      // 切换框位置
+      this.boxPosition = this.showSignIn ? "0%" : "80%";
+    },
+
+    // 检查手机号的方法
+    checkPhone() {
+
+      // 验证手机号格式正则表达式
+      // 不需要加双引号，加双引号无法识别为正则表达式
+      const phoneRegExp = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+
+      if(this.userPhone === "" || this.userPhone === undefined) {
+        this.showMessage("warning","请输入手机号");
+      }else if(!phoneRegExp.test(this.userPhone)) {
+        this.showMessage("warning","手机号格式不正确");
+      }else {
+
+        // 向服务器发起请求，验证手机号是否可以登录
+        toGet("/v1/user/phoneExists",{phone: this.userPhone}).then(response => {
+          if(response && response.data.code === 400) {
+            this.isPhoneErrExistSignIn = false;
+          }else if(response && response.data.code === 200) {
+            this.showMessage("warning","手机号未注册");
+            this.isPhoneErrExistSignUp = false;
+          }
+          else {
+            this.showMessage("error","服务繁忙，请稍后重试");
+          }
+        });
+      }
+    },
+
+    // 检查密码的方法
+    checkPwd() {
+      if(this.userPwd === "" || this.userPwd === undefined) {
+        this.showMessage("warning","请输入密码");
+      }else {
+        this.isPwdErrExist = false;
+      }
+    },
+
+    // 用户登录
+    signIn() {
+      this.checkPhone();
+      this.checkPwd();
+
+      // 等待 dom 容器更新后
+      this.$nextTick(() => {
+        if(!this.isPhoneErrExist && !this.isPwdErrExist) {
+          this.isLoading = true;
+
+          // 使用 MD5 加密密码
+          let newPasswd = md5(this.userPwd);
+
+          // 发起登录请求
+          doPost("/v1/user/login", {
+            phone: this.userPhone,
+            password: newPasswd,
+          }).then(response => {
+            if (response && response.data.code === 200) {
+
+              // 登录成功，存储 accessToken 至 localStorage，只能存字符串
+              window.localStorage.setItem("accessToken", response.data.accessToken);
+
+              const userInfo = response.data.retData;
+
+              this.$store.dispatch('asyncUpdateUser', {name: userInfo.name, phone: userInfo.phone, id: userInfo.id});
+
+              this.$store.dispatch('startSessionExpiryTimer');
+
+              // 用户名不为空，跳转至用户中心
+              this.showMessage("success", "登录成功，自动跳转至首页");
+              this.isLoading = false;
+              this.$router.push({
+                path: "/"
+              });
+            }
+            else {
+              this.showMessage("error", response.data.msg);
+              this.isLoading = false;
+            }
+          });
+        }
+      });
+    },
+
+    // 检查前后密码是否一致
+    checkPwdConfim() {
+      if(this.userPwdConfirm === "" || this.userPwdConfirm === undefined) {
+        this.showMessage("warning","请再次输入密码");
+      }else if(this.userPwd !== this.userPwdConfirm) {
+        this.showMessage("warning","前后密码不一致");
+      }else {
+        this.isPwdConfirm = true;
+      }
+    },
+
+    // 检查用户名是否为空
+    checkName() {
+      if(this.userName === "" || this.userName === undefined) {
+        this.showMessage("warning","请输入用户名");
+      }else {
+        this.isNameBlank = false;
+      }
+    },
+
+    // 用户注册
+    signUp() {
+      this.checkPhone();
+      this.checkPwd();
+      this.checkPwdConfim();
+      this.checkName();
+
+      // 等待 dom 容器更新后
+      this.$nextTick(() => {
+        if(!this.isPhoneErrExistSignUp && !this.isPwdErrExist && this.isPwdConfirm && !this.isNameBlank) {
+          this.isLoading = true;
+
+          // 数据正确，向后端发起注册请求
+          // 使用 MD5 加密密码
+          let newPasswd = md5(this.userPwd);
+
+          doPost("/v1/user/register",{
+            phone: this.userPhone,
+            password: newPasswd,
+            userName: this.userName
+          }).then(response => {
+            if(response && response.data.code === 200) {
+              this.showMessage("success","注册成功");
+              this.signIn();
+            }else {
+              this.showMessage("error",response.data.msg);
+              this.isLoading = false;
+            }
+          });
+        }
+      });
+    }
+  }
+  ,
   mounted() {
     require('particles.js')
     // eslint-disable-next-line no-undef
@@ -127,7 +322,7 @@ export default {
 
 /* font & button styling */
 h1 {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Source Code Pro Light", sans-serif;
   text-align: center;
   margin-top: 95px;
   text-transform: uppercase;
@@ -137,7 +332,7 @@ h1 {
 }
 
 .title {
-  font-family: "Lora", serif;
+  font-family: "Source Code Pro Light", serif;
   color: #8E9AAF;
   font-size: 1.8em;
   line-height: 1.1em;
@@ -157,7 +352,7 @@ h1 {
 }
 
 p {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Source Code Pro Light", sans-serif;
   font-size: 0.7em;
   letter-spacing: 2px;
   color: #8E9AAF;
@@ -178,7 +373,7 @@ span {
 }
 
 .smaller {
-  width: 90px;
+  width: 100px;
   height: 100px;
   top: 48%;
   left: 38%;
@@ -187,7 +382,7 @@ span {
 
 button {
   padding: 12px;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Source Code Pro Light", sans-serif;
   text-transform: uppercase;
   letter-spacing: 3px;
   font-size: 11px;
@@ -196,6 +391,7 @@ button {
   outline: none;
   display: block;
 }
+
 button:hover {
   background: #EAC7CC;
   color: #f6f6f6;
@@ -220,9 +416,11 @@ form {
 .more-padding {
   padding-top: 35px;
 }
+
 .more-padding input {
   padding: 12px;
 }
+
 .more-padding .submit {
   margin-top: 45px;
 }
@@ -232,6 +430,7 @@ form {
   padding: 12px;
   border-color: #ce7d88;
 }
+
 .submit:hover {
   background: #CBC0D3;
   border-color: #bfb1c9;
@@ -246,12 +445,14 @@ input {
   padding: 9px;
   margin: 7px;
 }
+
 input::placeholder {
   color: #f6f6f6;
   letter-spacing: 2px;
   font-size: 1.3em;
   font-weight: 100;
 }
+
 input:focus {
   color: #ce7d88;
   outline: none;
@@ -259,6 +460,7 @@ input:focus {
   font-size: 1em;
   transition: 0.8s all ease;
 }
+
 input:focus::placeholder {
   opacity: 0;
 }
@@ -274,12 +476,13 @@ label {
   display: inline;
   white-space: nowrap;
   position: relative;
-  left: -62px;
-  top: 5px;
+  left: -5vw;
+  top: 0.5vh;
 }
 
 input[type=checkbox] {
-  width: 7px;
+  width: 0.8vw;
+  height: 1.6vh;
   background: #ce7d88;
 }
 
