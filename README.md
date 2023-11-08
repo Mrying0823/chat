@@ -11,3 +11,8 @@
 
 2023/11/03 新增提问参考问题列表
 
+2023/11/08 新增首页、登录界面
+![image](https://github.com/Mrying0823/chat/assets/111051660/af3155bd-0aa9-4ce6-a290-96c8bd364674)
+![image](https://github.com/Mrying0823/chat/assets/111051660/9fab9554-9bea-4645-9934-fdf22e5898c6)
+
+
