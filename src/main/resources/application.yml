@@ -15,6 +15,7 @@ spring:
       # 更改密码
       username: mrying
       password: 123456
+
   servlet:
     multipart:
       max-file-size: 100MB
@@ -44,5 +45,12 @@ mybatis:
 api:
   chatgpt:
     host: https://api.chatanywhere.com.cn/
-    gptKey:
+    gptKey: sk-BVS6lkw0gCx6iA3PMwxXWKMBPqZy46K4bHbaHgqzc7KwEZse
 
+# JWT 配置
+jwt:
+  data:
+    # jwt加密密钥
+    secret: 2bc1a2207c684d7fb29df11f8abdc815
+    # jwt的过期时间(60s*60min*24h*7day)
+    expiration: 604800
