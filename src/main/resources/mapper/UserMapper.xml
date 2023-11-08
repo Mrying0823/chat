@@ -123,6 +123,43 @@
     where user_id = #{userId,jdbcType=VARCHAR}
   </select>
 
+  <!-- 查询用户表中所有的手机号 -->
+  <select id="selectUserPhone" resultType="java.lang.String">
+    select
+    user_phone as phone
+    from blog_user
+    group by user_phone
+  </select>
+
+  <!-- 注册新用户 -->
+  <insert id="insertNewUser" parameterType="org.mrying.chat.model.User">
+    insert into blog_user (user_id, user_phone, user_password,
+                           user_name, user_avatar, user_token_count,
+                           user_api_key)
+    values (#{userId,jdbcType=VARCHAR}, #{userPhone,jdbcType=VARCHAR}, #{userPassword,jdbcType=VARCHAR},
+            #{userName,jdbcType=VARCHAR}, #{userAvatar,jdbcType=VARCHAR}, #{userTokenCount,jdbcType=INTEGER},
+            #{userApiKey,jdbcType=VARCHAR})
+  </insert>
+
+  <!-- 用户登录验证 -->
+  <select id="selectUserByPhoneAndPwd" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+
+    from blog_user
+
+    <!-- where 关键字仅能有一个 -->
+    <where>
+      <if test="phone != null and phone != ''">
+        and user_phone = #{phone,jdbcType=VARCHAR}
+      </if>
+
+      <if test="loginPassword != null and loginPassword != ''">
+        and user_password = #{loginPassword,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+
   <!-- 扣除公用 api 使用次数 -->
   <update id="updateUserTokenCount" parameterType="org.mrying.chat.model.User">
     update blog_user
