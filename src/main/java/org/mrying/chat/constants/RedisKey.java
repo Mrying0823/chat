@@ -7,5 +7,11 @@ package org.mrying.chat.constants;
 public class RedisKey {
 
     // 用户提示
-    public static final String KEY_USER_QUESTION = "USER_QUESTION";
+    public static final String KEY_USER_QUESTION = "USER:QUESTION";
+
+    // 用户手机
+    public static final String KEY_USER_PHONE = "USER:PHONE";
+
+    // 用户 TOKEN
+    public static final String KEY_USER_TOKEN = "USER:TOKEN";
 }
