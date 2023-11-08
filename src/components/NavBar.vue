@@ -11,8 +11,10 @@
             {{ $store.getters.getUser.name }}
           </el-avatar>
         </router-link>
+        <ul class="sublevel menu">
+          <li @click="logout"><router-link :to="{path: '/'}">注销</router-link></li>
+        </ul>
       </li>
-
     </ul>
   </div>
 
@@ -28,9 +30,15 @@ export default {
       isAvatarShow: false
     }
   },
-  mounted() {
-    if(this.$store.getters.getUser.account) {
+  methods: {
+    logout() {
+      this.$store.dispatch('asyncClearUser');
       this.isAvatarShow = false;
+    }
+  },
+  mounted() {
+    if(this.$store.getters.getUser.phone) {
+      this.isAvatarShow = true;
     }
   }
 }
