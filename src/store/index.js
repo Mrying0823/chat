@@ -4,8 +4,9 @@ import createPersistedState from "vuex-persistedstate";
 const store = createStore({
     state: {
         user: {
-            name: "邓和颖",
-            account: "18978955805"
+            name: "",
+            phone: "",
+            id: ""
         },
         // 上一次选择的会话
         lastSelectedConversation: {
@@ -33,13 +34,13 @@ const store = createStore({
     actions: {
         asyncUpdateUser: (context, user) => {
             context.commit('updateUser', user);
-        },
-        asyncLastSelectedConversation: (context, lastSelectedConversation) => {
-            context.commit("updateLastSelectedConversation", lastSelectedConversation);
 
             // 设置会话过期时间（假设过期时间是 30 分钟后）
             const expiryTime = Date.now() + 30 * 60 * 1000;
             context.commit('updateSessionExpiryTime', expiryTime);
+        },
+        asyncLastSelectedConversation: (context, lastSelectedConversation) => {
+            context.commit("updateLastSelectedConversation", lastSelectedConversation);
         },
         // 创建一个定时器来检查会话是否过期
         startSessionExpiryTimer(context) {
@@ -48,8 +49,9 @@ const store = createStore({
                 if (context.state.sessionExpiryTime && currentTime >= context.state.sessionExpiryTime) {
                     // 会话过期，清除数据
                     context.commit('updateUser', {
-                        name: "邓和颖",
-                        account: "18978955805"
+                        name: "",
+                        phone: "",
+                        id: ""
                     });
                     context.commit('updateSessionExpiryTime', null);
                     context.commit("updateLastSelectedConversation",{
@@ -57,7 +59,19 @@ const store = createStore({
                         messageList: []
                     });
                 }
-            }, 1000); // 每秒检查一次
+            }, 10000);
+        },
+        asyncClearUser(context) {
+            context.commit('updateUser', {
+                name: "",
+                phone: "",
+                id: ""
+            });
+            context.commit('updateSessionExpiryTime', null);
+            context.commit("updateLastSelectedConversation",{
+                selectedConversationIndex: "",
+                messageList: []
+            });
         }
     },
     plugins: [createPersistedState()]
