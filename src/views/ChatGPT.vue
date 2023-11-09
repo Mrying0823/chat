@@ -37,6 +37,7 @@ import ChatGPTSidebar from "@/components/ChatGPTSidebar";
 import {doPost} from "@/axios/httpRequest";
 import FloatNavbar from "@/components/FloatNavbar";
 import NavBar from "@/components/NavBar";
+import {EventSourcePolyfill} from "event-source-polyfill"
 
 // 设置 marked 的选项及配置
 marked.setOptions({
@@ -185,56 +186,68 @@ export default {
       const data = {usePublicApi: this_.usePublicApi,prompt: this_.message,conversationId: this_.conversationId};
       const requestData = qs.stringify(data);
 
-      console.log(requestData);
+      const accessToken = localStorage.getItem("accessToken");
 
-      let sse = new EventSource(`http://localhost:8081/api/v1/chatgpt/chat?`+requestData,{withCredentials: true});
-
-      sse.addEventListener("open",(function () {
-        console.log('open');
-        this_.generating = true;
-        this_.message = "";
-        this_.items.push({
-          "messageId": "",
-          "messageDirection": 1,
-          "conversationId": "",
-          "content": "",
-          "createTime": 0
-        });
-      }));
-
-      sse.addEventListener("message",function (event) {
-        if(event.data === "[DONE]") {
-          sse.close();
-          this_.generating = false;
-          // 更新 store 数据
-          this_.$store.dispatch('asyncLastSelectedConversation', {selectedConversationIndex: this_.conversationId,messageList: this_.items});
-          return;
+      if(accessToken) {
+        const headers = {
+          Authorization: `${accessToken}`
         }
-        let answer = JSON.parse(event.data).content;
 
-        let last = this_.items[this_.items.length - 1];
-        last.content += answer;
-        let words = last.content.split('');
-        let html = words.join('');
-        last.html = marked.parse(html);
-      });
-
-      sse.addEventListener("error",function (event) {
-        console.log("error: "+event.data);
-        sse.close();
-
-        this_.$message({
-          type: "error",
-          center: true,
-          message: "服务繁忙，请稍后重试"
+        let sse = new EventSourcePolyfill(`http://localhost:8081/api/v1/chatgpt/chat?` + requestData, {
+          withCredentials: true,
+          headers
         });
 
-        this_.generating = true;
+        sse.addEventListener("open", (function () {
+          console.log('open');
+          this_.generating = true;
+          this_.message = "";
+          this_.items.push({
+            "messageId": "",
+            "messageDirection": 1,
+            "conversationId": "",
+            "content": "",
+            "createTime": 0
+          });
+        }));
 
-        setTimeout(() => {
-          this_.generating = false;
-        },5000);
-      });
+        sse.addEventListener("message", function (event) {
+          if (event.data === "[DONE]") {
+            sse.close();
+            this_.generating = false;
+            // 更新 store 数据
+            this_.$store.dispatch('asyncLastSelectedConversation', {
+              selectedConversationIndex: this_.conversationId,
+              messageList: this_.items
+            });
+            return;
+          }
+          let answer = JSON.parse(event.data).content;
+
+          let last = this_.items[this_.items.length - 1];
+          last.content += answer;
+          let words = last.content.split('');
+          let html = words.join('');
+          last.html = marked.parse(html);
+        });
+
+        sse.addEventListener("error", function (event) {
+          console.log("error: " + event.data);
+          sse.close();
+
+          this_.$message({
+            type: "error",
+            center: true,
+            message: "服务繁忙，请稍后重试"
+          });
+
+          this_.generating = true;
+
+          setTimeout(() => {
+            this_.generating = false;
+          }, 5000);
+        });
+      }
     }
   },
 
