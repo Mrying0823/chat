@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.mrying.chat.model.Conversation;
+import org.mrying.chat.utils.SecurityContextHolderUtils;
 import org.mrying.chat.view.RespResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +54,7 @@ public class ConversationController extends BaseController {
     public RespResult getConversation() {
         RespResult respResult = RespResult.fail();
 
-        List<Conversation> conversationList = conversationService.queryConversationByUserId("34382773848d4c86acb1f960c4681530");
+        List<Conversation> conversationList = conversationService.queryConversationByUserId(SecurityContextHolderUtils.getUserId());
 
         if(conversationList.isEmpty()) {
             respResult.setMsg("开启 chatGPT 对话吧");

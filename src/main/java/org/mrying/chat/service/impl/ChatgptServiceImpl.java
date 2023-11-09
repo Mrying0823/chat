@@ -16,6 +16,7 @@ import org.mrying.chat.model.ChatgptMessage;
 import org.mrying.chat.model.User;
 import org.mrying.chat.service.ChatgptService;
 import org.mrying.chat.settings.ChatgptConfiguration;
+import org.mrying.chat.utils.SecurityContextHolderUtils;
 import org.mrying.chat.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -116,7 +117,7 @@ public class ChatgptServiceImpl implements ChatgptService {
     public synchronized SseEmitter sendMsgBySse(Boolean usePublicApi, String conversationId, String prompt) {
 
         // 查询用户
-        User user = userMapper.selectUserById("34382773848d4c86acb1f960c4681530");
+        User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
 
         // 1、设置 api-key
         String key;
@@ -241,7 +242,7 @@ public class ChatgptServiceImpl implements ChatgptService {
     public List<String> queryQuestionByChatgpt(String prompt) {
 
         // 查询用户
-        User user = userMapper.selectUserById("34382773848d4c86acb1f960c4681530");
+        User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
 
         String key = RedisKey.KEY_USER_QUESTION.concat(user.getUserId()).concat(prompt);
 
@@ -277,7 +278,7 @@ public class ChatgptServiceImpl implements ChatgptService {
     @Override
     public List<String> refreshQuestionByChatgpt(String prompt) {
         // 查询用户
-        User user = userMapper.selectUserById("34382773848d4c86acb1f960c4681530");
+        User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
 
         String key = RedisKey.KEY_USER_QUESTION.concat(user.getUserId()).concat(prompt);
 

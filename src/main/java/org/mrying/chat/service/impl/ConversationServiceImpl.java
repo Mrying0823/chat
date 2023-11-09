@@ -4,6 +4,7 @@ import org.mrying.chat.mapper.ChatgptMessageMapper;
 import org.mrying.chat.mapper.ConversationMapper;
 import org.mrying.chat.model.Conversation;
 import org.mrying.chat.service.ConversationService;
+import org.mrying.chat.utils.SecurityContextHolderUtils;
 import org.mrying.chat.utils.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,8 @@ public class ConversationServiceImpl implements ConversationService {
     // 创建 chatgpt 会话
     @Override
     public String createConversation(Conversation conversation) {
-        // 设置创建人，暂时不设置
-        conversation.setUserId("34382773848d4c86acb1f960c4681530");
+        // 设置创建人
+        conversation.setUserId(SecurityContextHolderUtils.getUserId());
         // 设置创建时间
         conversation.setCreateTime(new Date());
         // 设置会话 ID
