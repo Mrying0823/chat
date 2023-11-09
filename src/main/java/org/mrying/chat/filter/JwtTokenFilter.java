@@ -44,9 +44,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         // 有 token，获取 userPhone
-        String userPhone;
+        String userId;
         try {
-            userPhone = jwtUtils.getUsernameFromToken(token);
+            userId = jwtUtils.getUserIdFromToken(token);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -54,13 +54,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         // 检查是否与 redis 中的 token 相同（是否退出登录）
-        if (!token.equals(stringRedisTemplate.opsForValue().get(RedisKey.KEY_USER_TOKEN+userPhone))) {
+        if (!token.equals(stringRedisTemplate.opsForValue().get(RedisKey.KEY_USER_TOKEN+userId))) {
             throw new RuntimeException("token illegal");
         }
 
         // 将 userPhone 信息存入 SecurityContextHolder
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userPhone, null, null);
+                new UsernamePasswordAuthenticationToken(userId, null, null);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
         // 放行

@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @since 2023/11/9 16:22
  */
 public class SecurityContextHolderUtils {
-    // 获取 SecurityContextHolder 中的 id
+    // 获取 SecurityContextHolder 中的 userId
     public static String getUserId() {
         try {
             UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
