@@ -12,4 +12,7 @@ public class Constants {
 
     // 发送消息时加入的上下文信息数
     public static final int MESSAGE_LIMIT_NUM = 6;
+
+    // token 中包含的验证信息
+    public static final String KEY_CLAIMS_PUT = "USER_ID";
 }

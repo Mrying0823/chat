@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.mrying.chat.constants.Constants;
 import org.mrying.chat.constants.RedisKey;
 import org.mrying.chat.model.User;
 import org.mrying.chat.utils.CommonUtils;
@@ -94,11 +95,11 @@ public class UserController extends BaseController {
         return respResult;
     }
 
-    private RespResult userLoginRespResult(User user,String phone) {
+    private RespResult userLoginRespResult(User user) {
 
         Map<String,Object> claims = new HashMap<>();
 
-        claims.put("phone",phone);
+        claims.put(Constants.KEY_CLAIMS_PUT,user.getUserId());
 
         String accessToken = jwtUtils.createToken(claims);
 
@@ -108,7 +109,7 @@ public class UserController extends BaseController {
         userInfo.put("phone",user.getUserPhone());
         userInfo.put("name",user.getUserName());
 
-        stringRedisTemplate.opsForValue().set(RedisKey.KEY_USER_TOKEN+user.getUserPhone(), accessToken, 7, TimeUnit.DAYS);
+        stringRedisTemplate.opsForValue().set(RedisKey.KEY_USER_TOKEN+user.getUserId(), accessToken, 7, TimeUnit.DAYS);
 
         RespResult respResult = RespResult.ok();
         respResult.setAccessToken(accessToken);
@@ -139,7 +140,7 @@ public class UserController extends BaseController {
         }else {
             User user = userService.queryUserByPhoneAndPwd(phone,passwd);
             if(user != null) {
-                respResult = userLoginRespResult(user,phone);
+                respResult = userLoginRespResult(user);
             }
         }
 
