@@ -205,7 +205,6 @@ width:200px;
 /* For different groups of item lists */
 .megamenu>div>ul {
     float:left;
-    overflow:hidden;
     padding:5px 0px;
     position:relative;
     width:20%;
@@ -244,8 +243,10 @@ width:200px;
 .holder-1 {
     padding:0px;
     background-color:transparent;
-    overflow:hidden;
+    overflow:auto;
+    height: 92vh;
     width:100%;
+    display: flex;
 }
 
 /* For the base of the long paragraph in megamenu */
@@ -253,6 +254,8 @@ width:200px;
     padding:0px;
     width:100%;
     margin:0px;
+    position: relative;
+    align-items: center;
 }
 
 /* For the paragraph in megamenu */
@@ -328,4 +331,8 @@ width:200px;
     position: fixed;
     right: 2.5vw;
     top: 1.2vh;
+}
+
+.nav-darkMode-switch {
+    height: 1.8vh;
 }
