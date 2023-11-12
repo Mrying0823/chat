@@ -1,7 +1,7 @@
 <template>
-  <div class="sidebar">
+  <div :class="this.$store.getters.getDarkMode ? 'night-mode-sidebar' : 'sidebar'">
     <!-- 新会话按钮 -->
-    <el-button class="create-btn" @click="createConversation" size="large">
+    <el-button :class="this.$store.getters.getDarkMode ? 'night-mode-create-btn': 'create-btn'" @click="createConversation" size="large">
         <el-icon><Plus /></el-icon>
         新建会话
     </el-button>
@@ -10,7 +10,15 @@
     <el-scrollbar class="conversation-list">
       <ul class="conversation-ul">
         <li v-for="conversation in conversationList" :key="conversation.conversationId">
-          <div class="conversation" @click="selectConversation(conversation.conversationId)" :class="{'conversation-active':selectedConversationIndex === conversation.conversationId}">
+          <div
+              @click="selectConversation(conversation.conversationId)"
+              :class="{
+                'conversation-active': selectedConversationIndex === conversation.conversationId && !this.$store.getters.getDarkMode,
+                'night-mode-conversation-active': selectedConversationIndex === conversation.conversationId && this.$store.getters.getDarkMode,
+                'conversation': !this.$store.getters.getDarkMode,
+                'night-mode-conversation': this.$store.getters.getDarkMode
+              }"
+          >
             <el-icon class="icon-chat-round" v-if="!editConfirm || !deleteConfirm"><ChatRound /></el-icon>
             <el-icon class="icon-chat-round" v-else-if="editConfirm && selectedConversationIndex === conversation.conversationId"><EditPen /></el-icon>
             <el-icon class="icon-chat-round" v-else-if="deleteConfirm && selectedConversationIndex === conversation.conversationId"><Delete /></el-icon>
@@ -35,7 +43,7 @@
 </template>
 
 <script>
-import {doPost} from "@/axios/httpRequest";
+import {doPost, toGet} from "@/axios/httpRequest";
 
 export default {
   name: "ChatGPTSidebar",
@@ -77,14 +85,7 @@ export default {
       editedName: "",
       editConfirm: false,
       deleteConfirm: false,
-      conversationList: [{
-        conversationId: "",
-        userId: "",
-        conversationType: 0,
-        createTime: 0,
-        conversationName: "新建会话",
-        firstMessage: ""
-      }],
+      conversationList: [],
       messageList: [{
         "messageId": "",
         "messageDirection": 0,
@@ -106,7 +107,7 @@ export default {
       }
 
       if(this_.editedName && index) {
-        doPost("/v1/chatgpt/editConversationName",{conversationId:index,conversationName: this_.editedName}).then(response => {
+        doPost("/chatgpt/editConversationName",{conversationId:index,conversationName: this_.editedName}).then(response => {
           if(response && response.data.code === 200) {
             this_.conversationList.forEach(function (conversation) {
               if(conversation.conversationId === index) {
@@ -143,7 +144,7 @@ export default {
     },
     // 删除会话
     deleteConversation(index) {
-      doPost("/v1/chatgpt/deleteConversation",{conversationId: index}).then(response => {
+      doPost("/chatgpt/deleteConversation",{conversationId: index}).then(response => {
         if(response && response.data.code === 200) {
 
           // 从 conversationList 中过滤掉对应的会话
@@ -170,7 +171,7 @@ export default {
         this.$emit("tran-messageList",this.lastSelectedConversation.messageList);
       }else if(index) {
 
-        doPost("/v1/chatgpt/getMessages", {conversationId: index}).then(response => {
+        doPost("/chatgpt/getMessages", {conversationId: index}).then(response => {
           if (response && response.data.code === 200) {
             this.messageList = response.data.list;
             // 在组件中触发 mutation 来更新数据
@@ -211,17 +212,17 @@ export default {
     // 启动计时器
     this.$store.dispatch('startSessionExpiryTimer');
 
-    // toGet("/v1/chatgpt/getConversation").then(response => {
-    //   if(response && response.data.code === 200) {
-    //     this.conversationList = response.data.list;
-    //   }else {
-    //     this.$message({
-    //       type: "info",
-    //       center: true,
-    //       message: response.data.msg
-    //     });
-    //   }
-    // });
+    toGet("/chatgpt/getConversation").then(response => {
+      if(response && response.data.code === 200) {
+        this.conversationList = response.data.list;
+      }else {
+        this.$message({
+          type: "info",
+          center: true,
+          message: response.data.msg
+        });
+      }
+    });
   }
 }
 </script>

@@ -25,6 +25,28 @@
     user-select: none;
 }
 
+.night-mode-home-container {
+    width: 100%; /* 设置容器宽度为100% */
+    box-sizing: border-box; /* 设置盒模型为border-box，确保内边距和边框不会增加容器的宽度 */
+    height: 100vh;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px #ccc;
+    position: fixed;
+    background-color: #324B4B !important;
+    color: #fff !important;
+}
+
+.night-mode-container {
+    background-color: #324B4B !important;
+    color: #fff !important;
+    font-family: "Source Code Pro Light",sans-serif;
+    background-repeat: no-repeat;
+    padding-left: 5%;
+    padding-right: 8%;
+    box-sizing: border-box;
+    user-select: none;
+}
+
 .left {
     height: 68vh;
     margin: 12vh 0 10vh 0;

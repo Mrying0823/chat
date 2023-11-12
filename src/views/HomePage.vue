@@ -1,9 +1,9 @@
 <template>
   <NavBar></NavBar>
-  <el-container class="home-container">
+  <el-container :class="this.$store.getters.getDarkMode ? 'night-mode-home-container': 'home-container'">
     <el-main>
       <div id="particles-js"></div>
-      <div class="container">
+      <div :class="this.$store.getters.getDarkMode ? 'night-mode-container': 'container'">
         <el-row>
           <!-- 左边区域，网站介绍-->
           <div class="el-col-16">

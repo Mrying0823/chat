@@ -21,6 +21,7 @@ import '@/assets/css/navbar/main-versions.css'
 import '@/assets/css/floatNavbar.css'
 import particlesJS from "particles.js";
 import '@/assets/css/homePage.css'
+import 'element-plus/theme-chalk/dark/css-vars.css'
 
 // 创建应用实例
 const app = createApp(App);

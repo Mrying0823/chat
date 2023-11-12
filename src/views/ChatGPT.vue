@@ -1,7 +1,7 @@
 <template>
   <NavBar></NavBar>
   <FloatNavbar @tran-question="sendQuestion"></FloatNavbar>
-  <el-container class="chat-container">
+  <el-container :class="this.$store.getters.getDarkMode ? 'night-mode-chat-container': 'chat-container'">
     <el-aside class="chat-aside">
       <ChatGPTSidebar @tran-messageList="updateMessageList" @tran-conversationId="updateConversationId" :conversationId="conversationId"></ChatGPTSidebar>
     </el-aside>
@@ -11,14 +11,22 @@
             <ul ref="chat-ul">
               <li v-for="item in items" :key="item.messageId" :class="item.messageDirection === 1? 'chat-reply':'chat-question'">
                 <div :class="item.messageDirection === 1? 'reply-info':'question-info'">
-                  <div v-html="item.html? item.html : item.content || ''" :class="item.messageDirection === 1? 'reply-info-content':'question-info-content'"></div>
+                  <div
+                      v-html="item.html? item.html : item.content || ''"
+                      :class="{
+                        'reply-info-content': item.messageDirection === 1 && !this.$store.getters.getDarkMode,
+                        'night-mode-reply-info-content': item.messageDirection === 1 && this.$store.getters.getDarkMode,
+                        'question-info-content': item.messageDirection !== 1 && !this.$store.getters.getDarkMode,
+                        'night-mode-question-info-content': item.messageDirection !== 1 && this.$store.getters.getDarkMode
+                      }"
+                  />
                 </div>
               </li>
             </ul>
           </el-scrollbar>
         </el-main>
         <el-footer class="chat-footer">
-          <div class="chat-input borderNone">
+          <div class="borderNone" :class="this.$store.getters.getDarkMode ? 'night-mode-chat-input': 'chat-input'">
             <el-input class="message-input" type="textarea" v-model="message" @keydown="handleKeyDown" placeholder="请输入您的消息..." :autosize="{ minRows: 1, maxRows: 2}"></el-input>
             <el-button type="text" @click="onSendMessage(message)" :disabled="generating" :loading="generating"><el-icon v-show="!generating"><Position /></el-icon></el-button>
           </div>
@@ -164,7 +172,7 @@ export default {
       // 获取 conversationId
       // 创建新会话
       if(!this_.conversationId) {
-        await doPost("/v1/chatgpt/createConversation", {conversationType: 0, conversationName: "新建会话"}).then(response => {
+        await doPost("/chatgpt/createConversation", {conversationType: 0, conversationName: "新建会话"}).then(response => {
           if (response && response.data.code === 200) {
             this.conversationId = response.data.conversationId;
           } else {

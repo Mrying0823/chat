@@ -501,3 +501,55 @@ color:#F08080;
     color:#f0f0f0;
     background-color:darkcyan;
 }
+
+/*----------------------------------------------------------------------------------------------------------------------------------*/
+
+.night-mode {
+    background-color: #333 !important;
+    color: #fff !important;
+}
+
+/* For back color of the nav */
+.night-mode > ul {
+    background-color:#333;
+}
+
+/* For main nav links */
+.night-mode > ul > li >a {
+    color:#f0f0f0;
+}
+
+/* For hover state of main nav links */
+.night-mode > ul > li:hover > a {
+    color:#fff;
+    background-color:#324B4B;
+}
+
+/* For sublevel menu links coloring */
+.night-mode > ul > li .menu >li>a {
+    color:#f0f0f0;
+    background-color:#333;
+}
+
+/* For sublevel menu links hover state */
+.night-mode > ul > li .menu >li:hover>a {
+    color:#fff;
+    background-color:#324B4B;
+}
+
+/* For adding a green colored top border to sublevel menu and megamenu */
+.night-mode > ul > li > .menu, .night-mode > ul > li > .megamenu {
+    border-top:4px solid #324B4B;
+    background-color: #333;
+}
+
+/* For group heading, of megamenu, coloring */
+.night-mode > ul > li > .megamenu h3 {
+    color:#333;
+}
+
+/* For hover state of megamenu group item list */
+.night-mode > ul > li > .megamenu > div > ul > li > a:hover {
+    color:#fff;
+    background-color:#324B4B;
+}

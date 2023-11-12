@@ -14,11 +14,15 @@ const store = createStore({
             messageList: []
         },
         // 会话过期时间
-        sessionExpiryTime: null
+        sessionExpiryTime: null,
+        // 夜间模式
+        darkMode: false
+
     },
     getters: {
         getUser: (state) => state.user,
-        getLastSelectedConversation: (state) => state.lastSelectedConversation
+        getLastSelectedConversation: (state) => state.lastSelectedConversation,
+        getDarkMode: (state) => state.darkMode
     },
     mutations: {
         updateUser: (state, user) => {
@@ -29,14 +33,17 @@ const store = createStore({
         },
         updateSessionExpiryTime(state, expiryTime) {
             state.sessionExpiryTime = expiryTime;
+        },
+        updateDarkMode(state, darkMode) {
+            state.darkMode = darkMode;
         }
     },
     actions: {
         asyncUpdateUser: (context, user) => {
             context.commit('updateUser', user);
 
-            // 设置会话过期时间（假设过期时间是 30 分钟后）
-            const expiryTime = Date.now() + 30 * 60 * 1000;
+            // 设置会话过期时间
+            const expiryTime = Date.now() + 60 * 60 * 1000 * 24 * 7;
             context.commit('updateSessionExpiryTime', expiryTime);
         },
         asyncLastSelectedConversation: (context, lastSelectedConversation) => {
@@ -72,7 +79,11 @@ const store = createStore({
                 selectedConversationIndex: "",
                 messageList: []
             });
+            context.commit('updateDarkMode', false);
         }
+    },
+    asyncDarkMode: (context, darkMode) => {
+        context.commit('updateDarkMode', darkMode);
     },
     plugins: [createPersistedState()]
 });

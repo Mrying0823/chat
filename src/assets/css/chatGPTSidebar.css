@@ -5,6 +5,13 @@
     padding: 10px;
 }
 
+.night-mode-sidebar {
+    height: 100%;
+    box-sizing: border-box;
+    background: #18392F;
+    padding: 10px;
+}
+
 .create-btn {
     width: 13vw;
     color: white;
@@ -24,6 +31,29 @@
 .create-btn:active{
     /* 鼠标悬停状态的按钮背景颜色和文本颜色 */
     background-color: #1ab2b2;
+    color: white;
+    border-color: white;
+}
+
+.night-mode-create-btn {
+    width: 13vw;
+    color: white;
+    background-color: transparent;
+    border-color: white;
+    font-family: "Source Code Pro Light", sans-serif;
+    padding-right: 65%;
+}
+
+.night-mode-create-btn .el-icon {
+    margin-right: 15%;
+    margin-bottom: 3%;
+    font-size: 14px;
+}
+
+.night-mode-create-btn:hover,
+.night-mode-create-btn:active{
+    /* 鼠标悬停状态的按钮背景颜色和文本颜色 */
+    background-color: #324B4B;
     color: white;
     border-color: white;
 }
@@ -61,6 +91,32 @@
 
 .conversation-active {
     background-color: #1ab2b2;
+    color: white;
+    border-radius: 4px;
+}
+
+.night-mode-conversation {
+    cursor: pointer; /* 手势鼠标 */
+    user-select: none; /* 不显示输入光标 */
+    display: flex;
+    align-items: center; /* 垂直居中 */
+    font-size: 14px;
+    margin: 8px 0;
+    padding: 10px;
+    background-color: transparent;
+    color: white;
+}
+
+.night-mode-conversation:hover,
+.night-mode-conversation:focus{
+    /* 鼠标悬停状态的按钮背景颜色和文本颜色 */
+    background-color: #324B4B;
+    color: white;
+    border-radius: 4px;
+}
+
+.night-mode-conversation-active {
+    background-color: #324B4B;
     color: white;
     border-radius: 4px;
 }

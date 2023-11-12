@@ -139,7 +139,7 @@ animation-fill-mode:forwards; /* Standard Syntax */
 }
 
 .sublevel li {
-    width: 7.8vw !important; /* 设置宽度为 100 像素，根据你的需求调整 */
+    width: 7.8vw !important;
 }
 
 /* For right arrows, associated with the links of the sublevel menu which itself has a sublevel of menu  */
@@ -329,8 +329,10 @@ width:200px;
 
 .nav-login-avatar {
     position: fixed;
-    right: 2.5vw;
+    right: 2vw;
     top: 1.2vh;
+    width: fit-content;
+    padding: 5px;
 }
 
 .nav-darkMode-switch {

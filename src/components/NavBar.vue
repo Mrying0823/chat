@@ -1,5 +1,5 @@
 <template>
-  <div class="nav darkcyan">
+  <div class="nav" :class="store.getters.getDarkMode ? 'night-mode': 'darkcyan'">
     <ul>
       <li><router-link :to="{path: '/'}"><i class="fa fa-home"></i></router-link></li>
       <li><router-link :to="{path: '/gpt/chatGPT'}"><i class="fa fa-comments-o"></i><span>ChatGPT </span></router-link></li>
@@ -7,7 +7,7 @@
       <li class="nav-login" v-show="isAvatarShow">
         <router-link :to="{path: '/'}">
           <i class="fa fa-user"></i>
-          <el-avatar class="nav-login-avatar" shape="square">
+          <el-avatar class="nav-login-avatar" shape="square" :style="`background:${extractColorByName(store.getters.getUser.name)}`">
             {{ $store.getters.getUser.name }}
           </el-avatar>
         </router-link>
@@ -16,8 +16,10 @@
             <el-switch
                 class="nav-darkMode-switch"
                 v-model="isDark"
-                :active-action-icon="Sunny"
-                :inactive-action-icon="Moon"
+                inline-prompt
+                :active-icon="Sunny"
+                :inactive-icon="Moon"
+                style="--el-switch-on-color: #002B2E;"
             />
           </a></li>
           <li @click="logout"><a style="cursor: pointer">注销</a></li>
@@ -196,38 +198,47 @@
   <br>
 </template>
 
-<script>
+<!-- setup 是 vue3 的新特性 -->
+<script setup>
 import { useDark, useToggle } from '@vueuse/core';
+import { onMounted, ref } from 'vue';
+import { Sunny, Moon } from '@element-plus/icons-vue';
+import store from "@/store";
+import router from "@/router";
 
-export default {
-  name: "NavBar",
-  data() {
-    return {
-      isAvatarShow: false,
-      isDark: useDark()
-    }
-  },
-  methods: {
-    logout() {
-      this.$store.dispatch('asyncClearUser');
-      // 清空本地存储
-      localStorage.clear();
-      this.isAvatarShow = false;
-      // 跳转到指定路径
-      this.$router.push('/');
-    },
-    toggleDark() {
-      useToggle(this.isDark);
-    }
-  },
-  mounted() {
-    if(this.$store.getters.getUser.phone) {
-      this.isAvatarShow = true;
-    }
+const isAvatarShow = ref(false);
+const isDark = useDark();
+
+// 注销
+const logout = () => {
+  store.dispatch('asyncClearUser');
+  localStorage.clear();
+  isAvatarShow.value = false;
+  router.push('/');
+};
+
+// 切换夜间模式
+const toggleDark = () => {
+  useToggle(isDark);
+  store.commit("updateDarkMode",isDark);
+};
+
+// 根据头像名字切换头像颜色
+const extractColorByName = (name) => {
+  var temp = [];
+  temp.push("#");
+  for (let index = 0; index < name.length; index++) {
+    temp.push(parseInt(name[index].charCodeAt(0), 10).toString(24));
   }
+  return temp.slice(0, 5).join('').slice(0, 4);
 }
+
+onMounted(() => {
+  if (store.getters.getUser.phone) {
+    isAvatarShow.value = true;
+  }
+});
 </script>
 
 <style scoped>
-
 </style>
