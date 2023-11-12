@@ -4,7 +4,7 @@ import qs from "qs";
 const accessToken = localStorage.getItem("accessToken");
 
 // 设置默认值
-axios.defaults.baseURL = "http://localhost:8081/api";
+axios.defaults.baseURL = "http://localhost:8081/api/v1";
 axios.defaults.timeout = 20000;
 // 设置全局请求头，携带令牌
 if(accessToken) {
