@@ -28,6 +28,9 @@ public class RespResult {
 
     private String conversationId;
 
+    // 笔记专题 Id
+    private String noteCategoryId;
+
     // 表示成功的 RespResult 对象
     public static RespResult ok() {
         RespResult respResult = new RespResult();
@@ -102,5 +105,13 @@ public class RespResult {
 
     public void setConversationId(String conversationId) {
         this.conversationId = conversationId;
+    }
+
+    public String getNoteCategoryId() {
+        return noteCategoryId;
+    }
+
+    public void setNoteCategoryId(String noteCategoryId) {
+        this.noteCategoryId = noteCategoryId;
     }
 }
