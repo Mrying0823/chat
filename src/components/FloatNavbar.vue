@@ -70,7 +70,7 @@ export default {
     refreshQuestionList() {
       if(this.currentQuestion) {
         this.generating = true;
-        doPost("/v1/chatgpt/refreshChatList",{prompt: this.currentQuestion}).then(response => {
+        doPost("/chatgpt/refreshChatList",{prompt: this.currentQuestion}).then(response => {
           if(response && response.data.code === 200) {
             this.questionList = response.data.list;
             this.generating = false;
@@ -88,7 +88,7 @@ export default {
       if(this.userPrompt) {
         this.currentQuestion = this.userPrompt;
         this.generating = true;
-        doPost("/v1/chatgpt/chatList", {prompt: this.userPrompt}).then(response => {
+        doPost("/chatgpt/chatList", {prompt: this.userPrompt}).then(response => {
           if (response && response.data.code === 200) {
             this.questionList = response.data.list;
             this.userPrompt = "";

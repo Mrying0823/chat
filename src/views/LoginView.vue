@@ -31,7 +31,7 @@
           <div class="leftbox">
             <h2 class="title"><span>SignUp</span>&<br>Chat</h2>
             <p class="desc">选择你的<span>登录方式</span></p>
-            <img class="flower smaller" src="../assets/img/手捧脸.png" alt="" border="0">
+            <img class="flower smaller" src="../assets/img/手捧脸.png" alt="">
             <p class="account">已经有账号了?</p>
             <button class="button" id="signin" @click="toggleForms">登录</button>
           </div>
@@ -123,32 +123,65 @@ export default {
 
       if(this.userPhone === "" || this.userPhone === undefined) {
         this.showMessage("warning","请输入手机号");
-      }else if(!phoneRegExp.test(this.userPhone)) {
-        this.showMessage("warning","手机号格式不正确");
-      }else {
-
-        // 向服务器发起请求，验证手机号是否可以登录
-        toGet("/v1/user/phoneExists",{phone: this.userPhone}).then(response => {
-          if(response && response.data.code === 400) {
-            this.isPhoneErrExistSignIn = false;
-          }else if(response && response.data.code === 200) {
-            this.showMessage("warning","手机号未注册");
-            this.isPhoneErrExistSignUp = false;
-          }
-          else {
-            this.showMessage("error","服务繁忙，请稍后重试");
-          }
-        });
+        return;
       }
+
+      if(!phoneRegExp.test(this.userPhone)) {
+        this.showMessage("warning","手机号格式不正确");
+        return;
+      }
+
+      // 向服务器发起请求，验证手机号是否可以登录
+      toGet("/user/phoneExists",{phone: this.userPhone}).then(response => {
+        if(response && response.data.code === 400) {
+          this.isPhoneErrExistSignIn = false;
+        }else if(response && response.data.code === 200) {
+          this.showMessage("warning","手机号未注册");
+          this.isPhoneErrExistSignUp = false;
+        }
+        else {
+          this.showMessage("error","服务繁忙，请稍后重试");
+        }
+      });
+    },
+
+    // 检查手机号的方法
+    checkPhoneForSignUp() {
+
+      // 验证手机号格式正则表达式
+      // 不需要加双引号，加双引号无法识别为正则表达式
+      const phoneRegExp = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+
+      if(this.userPhone === "" || this.userPhone === undefined) {
+        this.showMessage("warning","请输入手机号");
+        return;
+      }
+
+      if(!phoneRegExp.test(this.userPhone)) {
+        this.showMessage("warning","手机号格式不正确");
+        return;
+      }
+
+      // 向服务器发起请求，验证手机号是否可以登录
+      toGet("/user/phoneExists",{phone: this.userPhone}).then(response => {
+        if(response && response.data.code === 400) {
+          this.showMessage("warning","手机号已注册");
+        }else if(response && response.data.code === 200) {
+          this.isPhoneErrExistSignUp = false;
+        }
+        else {
+          this.showMessage("error","服务繁忙，请稍后重试");
+        }
+      });
     },
 
     // 检查密码的方法
     checkPwd() {
       if(this.userPwd === "" || this.userPwd === undefined) {
         this.showMessage("warning","请输入密码");
-      }else {
-        this.isPwdErrExist = false;
+        return;
       }
+      this.isPwdErrExist = false;
     },
 
     // 用户登录
@@ -158,14 +191,14 @@ export default {
 
       // 等待 dom 容器更新后
       this.$nextTick(() => {
-        if(!this.isPhoneErrExist && !this.isPwdErrExist) {
+        if(!this.isPhoneErrExistSignIn && !this.isPwdErrExist) {
           this.isLoading = true;
 
           // 使用 MD5 加密密码
           let newPasswd = md5(this.userPwd);
 
           // 发起登录请求
-          doPost("/v1/user/login", {
+          doPost("/user/login", {
             phone: this.userPhone,
             password: newPasswd,
           }).then(response => {
@@ -200,25 +233,30 @@ export default {
     checkPwdConfim() {
       if(this.userPwdConfirm === "" || this.userPwdConfirm === undefined) {
         this.showMessage("warning","请再次输入密码");
-      }else if(this.userPwd !== this.userPwdConfirm) {
-        this.showMessage("warning","前后密码不一致");
-      }else {
-        this.isPwdConfirm = true;
+        return;
       }
+
+      if(this.userPwd !== this.userPwdConfirm) {
+        this.showMessage("warning","前后密码不一致");
+        return;
+      }
+
+      this.isPwdConfirm = true;
     },
 
     // 检查用户名是否为空
     checkName() {
       if(this.userName === "" || this.userName === undefined) {
         this.showMessage("warning","请输入用户名");
-      }else {
-        this.isNameBlank = false;
+        return;
       }
+
+      this.isNameBlank = false;
     },
 
     // 用户注册
     signUp() {
-      this.checkPhone();
+      this.checkPhoneForSignUp();
       this.checkPwd();
       this.checkPwdConfim();
       this.checkName();
@@ -232,7 +270,7 @@ export default {
           // 使用 MD5 加密密码
           let newPasswd = md5(this.userPwd);
 
-          doPost("/v1/user/register",{
+          doPost("/user/register",{
             phone: this.userPhone,
             password: newPasswd,
             userName: this.userName
@@ -299,11 +337,6 @@ export default {
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   transition: all 0.5s ease-in-out;
   z-index: 2;
-}
-
-.nodisplay {
-  display: none;
-  transition: all 0.5s ease;
 }
 
 .leftbox, .rightbox {
@@ -419,21 +452,6 @@ form {
 
 .more-padding input {
   padding: 12px;
-}
-
-.more-padding .submit {
-  margin-top: 45px;
-}
-
-.submit {
-  margin-top: 25px;
-  padding: 12px;
-  border-color: #ce7d88;
-}
-
-.submit:hover {
-  background: #CBC0D3;
-  border-color: #bfb1c9;
 }
 
 input {
