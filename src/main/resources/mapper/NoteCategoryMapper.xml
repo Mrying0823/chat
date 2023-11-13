@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.mrying.chat.mapper.NoteCategoryMapper" >
+  <resultMap id="BaseResultMap" type="org.mrying.chat.model.NoteCategory" >
+    <id column="category_id" property="categoryId" jdbcType="CHAR" />
+    <result column="category_title" property="categoryTitle" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    category_id, category_title, user_id, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_note_category
+    where category_id = #{categoryId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tbl_note_category
+    where category_id = #{categoryId,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="org.mrying.chat.model.NoteCategory" >
+    insert into tbl_note_category (category_id, category_title, user_id, 
+      create_time)
+    values (#{categoryId,jdbcType=CHAR}, #{categoryTitle,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="org.mrying.chat.model.NoteCategory" >
+    insert into tbl_note_category
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="categoryId != null" >
+        category_id,
+      </if>
+      <if test="categoryTitle != null" >
+        category_title,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="categoryId != null" >
+        #{categoryId,jdbcType=CHAR},
+      </if>
+      <if test="categoryTitle != null" >
+        #{categoryTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="org.mrying.chat.model.NoteCategory" >
+    update tbl_note_category
+    <set >
+      <if test="categoryTitle != null" >
+        category_title = #{categoryTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where category_id = #{categoryId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.mrying.chat.model.NoteCategory" >
+    update tbl_note_category
+    set category_title = #{categoryTitle,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=CHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where category_id = #{categoryId,jdbcType=CHAR}
+  </update>
+
+  <!-- 新建笔记专题 -->
+  <insert id="insertNewNoteCategory" parameterType="org.mrying.chat.model.NoteCategory">
+    insert into tbl_note_category (category_id, category_title, user_id,
+                                   create_time)
+    values (#{categoryId,jdbcType=CHAR}, #{categoryTitle,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR},
+            #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <!-- 获取用户的所以笔记专题 -->
+  <select id="selectNoteCategoryByUserId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from tbl_note_category
+    where user_id = #{userId,jdbcType=VARCHAR}
+    order by create_time desc
+  </select>
+
+  <!-- 根据 id 删除笔记专题-->
+  <delete id="deleteNoteCategoryById" parameterType="java.lang.String">
+    delete from tbl_note_category
+    where category_id = #{categoryId,jdbcType=CHAR}
+  </delete>
+
+  <!-- 根据 categoryId 查询笔记专题并修改标题 -->
+  <update id="updateCategoryTitleById">
+    update tbl_note_category
+    set category_title = #{categoryTitle,jdbcType=VARCHAR}
+    where category_id = #{categoryId,jdbcType=CHAR}
+  </update>
+</mapper>

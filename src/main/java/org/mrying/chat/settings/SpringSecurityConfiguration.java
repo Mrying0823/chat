@@ -31,7 +31,12 @@ public class SpringSecurityConfiguration {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeHttpRequests()
-                .mvcMatchers("/doc.html/**","/swagger-ui.html/**", "/v2/api-docs", "/swagger-resources/**").permitAll()
+                .mvcMatchers("/doc.html/**",
+                        "/swagger-ui.html/**",
+                        "/webjars/**",
+                        "/swagger-resources/**",
+                        "/v2/api-docs",
+                        "/v2/api-docs-ext").permitAll()
                 .mvcMatchers("/v1/user/phoneExists","/v1/user/register","/v1/user/login").permitAll()
                 .anyRequest()
                 .authenticated();

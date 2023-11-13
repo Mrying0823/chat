@@ -1,9 +1,6 @@
 package org.mrying.chat.controller;
 
-import org.mrying.chat.service.ChatgptMessageService;
-import org.mrying.chat.service.ChatgptService;
-import org.mrying.chat.service.ConversationService;
-import org.mrying.chat.service.UserService;
+import org.mrying.chat.service.*;
 import org.mrying.chat.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -38,4 +35,8 @@ public class BaseController {
     // JwtUtils
     @Resource
     protected JwtUtils jwtUtils;
+
+    // 笔记专题服务
+    @Resource
+    protected NoteCategoryService noteCategoryService;
 }

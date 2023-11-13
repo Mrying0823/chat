@@ -12,7 +12,7 @@
     conversation_id, user_id, conversation_type, create_time,conversation_name
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from blog_conversation
     where conversation_id = #{conversationId,jdbcType=VARCHAR}
@@ -22,10 +22,10 @@
     where conversation_id = #{conversationId,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="org.mrying.chat.model.Conversation" >
-    insert into blog_conversation (conversation_id, user_id, conversation_type, 
-      create_time)
-    values (#{conversationId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{conversationType,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP})
+    insert into blog_conversation (conversation_id, user_id, conversation_type,
+                                   create_time)
+    values (#{conversationId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{conversationType,jdbcType=INTEGER},
+            #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="org.mrying.chat.model.Conversation" >
     insert into blog_conversation
@@ -76,8 +76,8 @@
   <update id="updateByPrimaryKey" parameterType="org.mrying.chat.model.Conversation" >
     update blog_conversation
     set user_id = #{userId,jdbcType=VARCHAR},
-      conversation_type = #{conversationType,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+        conversation_type = #{conversationType,jdbcType=INTEGER},
+        create_time = #{createTime,jdbcType=TIMESTAMP}
     where conversation_id = #{conversationId,jdbcType=VARCHAR}
   </update>
   <insert id="insertNewConversation" parameterType="org.mrying.chat.model.Conversation">
