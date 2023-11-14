@@ -166,3 +166,7 @@
     white-space: nowrap; /* 防止文本换行 */
     text-overflow: ellipsis; /* 用省略号表示溢出内容 */
 }
+
+.anti-transparent {
+    background: #324B4B;
+}
