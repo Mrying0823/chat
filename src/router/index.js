@@ -6,6 +6,7 @@ import GPTWindow3 from "@/views/GPTWindow3";
 import HomePage from "@/views/HomePage";
 import LoginView from "@/views/LoginView";
 import store from "@/store";
+import NoteView from "@/views/NoteView";
 
 const routes = [
   {
@@ -40,6 +41,14 @@ const routes = [
     path: "/user/login",
     name: "LoginView",
     component: LoginView
+  },
+  {
+    path: "/note/userNote",
+    name: "NoteView",
+    component: NoteView,
+    meta: {
+      requireAuth: true
+    }
   }
 ]
 
@@ -52,9 +61,9 @@ router.beforeEach((to, from, next) => {
   const phone = store.state.user.phone;
 
   // 如果路由需要登录且用户未登录，重定向到登录页面
-  if (to.matched.some(record => record.meta.requireAuth) && !phone) {
+  if(to.matched.some(record => record.meta.requireAuth) && !phone) {
     next('/user/login');
-  } else {
+  }else {
     next();
   }
 });
