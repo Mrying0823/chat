@@ -24,7 +24,7 @@
             <el-icon class="icon-chat-round" v-else-if="deleteConfirm && selectedConversationIndex === conversation.conversationId"><Delete /></el-icon>
             <span class="span-conversation-name-length" v-html="conversation.conversationName"></span>
             <!-- 会话名称修改输入框 -->
-            <el-input class="input-edit-name" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm" v-model="editedName"></el-input>
+            <el-input class="input-edit-name" :class="{'anti-transparent': this.$store.getters.getDarkMode}" v-if="selectedConversationIndex === conversation.conversationId" v-show="editConfirm" v-model="editedName"></el-input>
             <!-- 编辑图标 -->
             <el-icon class="icon-edit-pen" v-if="selectedConversationIndex === conversation.conversationId" @click.stop="editClick(conversation.conversationName)" v-show="!deleteConfirm && !editConfirm"><EditPen /></el-icon>
             <!-- 保存修改 -->
@@ -161,6 +161,13 @@ export default {
     // 切换会话
     selectConversation(index) {
 
+      if(this.selectedConversationIndex !== index) {
+        // 自动切换笔记专题重置图标
+        this.deleteConfirm = false;
+
+        this.editConfirm = false;
+      }
+
       this.selectedConversationIndex = index;
 
       this.$emit("tran-conversationId",index);
@@ -184,9 +191,6 @@ export default {
         // 新建会话
         this.$emit("tran-messageList",[]);
       }
-
-      // 自动切换会话重置删除图标
-      this.deleteConfirm = false;
     },
     createConversation(event) {
       // 使按钮失焦
