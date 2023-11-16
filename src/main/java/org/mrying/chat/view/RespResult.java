@@ -31,6 +31,9 @@ public class RespResult {
     // 笔记专题 Id
     private String noteCategoryId;
 
+    // 笔记 Id
+    private String noteId;
+
     // 表示成功的 RespResult 对象
     public static RespResult ok() {
         RespResult respResult = new RespResult();
@@ -113,5 +116,13 @@ public class RespResult {
 
     public void setNoteCategoryId(String noteCategoryId) {
         this.noteCategoryId = noteCategoryId;
+    }
+
+    public String getNoteId() {
+        return noteId;
+    }
+
+    public void setNoteId(String noteId) {
+        this.noteId = noteId;
     }
 }

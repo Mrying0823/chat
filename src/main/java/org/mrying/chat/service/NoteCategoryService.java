@@ -1,6 +1,5 @@
 package org.mrying.chat.service;
 
-import org.mrying.chat.model.Conversation;
 import org.mrying.chat.model.NoteCategory;
 
 import java.util.List;

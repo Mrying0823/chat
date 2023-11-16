@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="org.mrying.chat.model.Note" >
     <id column="note_id" property="noteId" jdbcType="CHAR" />
     <result column="note_title" property="noteTitle" jdbcType="VARCHAR" />
+    <result column="note_content" property="noteContent" jdbcType="LONGVARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="user_id" property="userId" jdbcType="CHAR" />
     <result column="category_id" property="categoryId" jdbcType="CHAR" />
@@ -119,8 +120,40 @@
     where note_id = #{noteId,jdbcType=CHAR}
   </update>
 
+  <!-- 根据笔记专题 Id 删除关联笔记 -->
   <delete id="deleteNoteByCategoryId" parameterType="java.lang.String">
     delete from tbl_note
     where category_id = #{categoryId,jdbcType=CHAR}
   </delete>
+
+  <!-- 新建笔记 -->
+  <insert id="insertNewNote" parameterType="org.mrying.chat.model.Note">
+    insert into tbl_note (note_id, note_title, create_time,
+                          user_id, category_id, note_content
+    )
+    values (#{noteId,jdbcType=CHAR}, #{noteTitle,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{userId,jdbcType=CHAR}, #{categoryId,jdbcType=CHAR}, #{noteContent,jdbcType=LONGVARCHAR}
+           )
+  </insert>
+
+  <!-- 根据 noteId 删除笔记 -->
+  <delete id="deleteNoteById" parameterType="java.lang.String">
+    delete from tbl_note
+    where note_id = #{noteId,jdbcType=CHAR}
+  </delete>
+
+  <!-- 根据 noteId 修改笔记名称 -->
+  <update id="updateNoteTitleById">
+    update tbl_note
+    set note_title = #{noteTitle,jdbcType=VARCHAR},
+    where note_id = #{noteId,jdbcType=CHAR}
+  </update>
+
+  <!-- 根据笔记专题 Id 查询其所有关联笔记 -->
+  <select id="selectNoteByCategoryId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from tbl_note
+    where note_id = #{noteId,jdbcType=CHAR}
+  </select>
 </mapper>

@@ -23,6 +23,7 @@ public interface NoteCategoryMapper {
 
     int updateByPrimaryKey(NoteCategory record);
 
+    // 新建笔记专题
     int insertNewNoteCategory(NoteCategory category);
 
     // 根据 userId 查询与用户创建的笔记专题

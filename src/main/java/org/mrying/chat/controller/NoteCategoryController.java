@@ -22,7 +22,7 @@ public class NoteCategoryController extends BaseController {
     // 新建笔记专题
     @ApiOperation(value = "新建笔记专题",notes = "新建笔记专题")
     @PostMapping("/note/createNoteCategory")
-    public RespResult createConversation() {
+    public RespResult createNoteCategory() {
         RespResult respResult = RespResult.fail();
 
         NoteCategory category = new NoteCategory();
@@ -61,12 +61,12 @@ public class NoteCategoryController extends BaseController {
     @ApiOperation(value = "删除笔记专题及关联笔记",notes = "根据笔记专题 id 删除笔记专题及关联笔记")
     @ApiImplicitParam(name = "categoryId",value = "笔记专题 Id")
     @PostMapping("/note/deleteNoteCategory")
-    public RespResult deleteConversation(@RequestParam("categoryId") String categoryId) {
+    public RespResult deleteNoteCategory(@RequestParam("categoryId") String categoryId) {
         RespResult respResult = RespResult.fail();
 
         int result = noteCategoryService.deleteNoteCategoryById(categoryId);
 
-        if(result > 0) {
+        if(result >= 0) {
             respResult = RespResult.ok();
         }else {
             respResult.setMsg("服务繁忙，请稍后重试");
@@ -82,11 +82,11 @@ public class NoteCategoryController extends BaseController {
             @ApiImplicitParam(name = "categoryTitle",value = "笔记专题标题",required = true)
     })
     @PostMapping("/note/editNoteCategoryTitle")
-    public RespResult editConversationName(@RequestParam("categoryId") String categoryId,
+    public RespResult editNoteCategoryTitle(@RequestParam("categoryId") String categoryId,
                                            @RequestParam("categoryTitle") String categoryTitle) {
         RespResult respResult = RespResult.fail();
 
-        int result = conversationService.editConversationNameById(categoryId,categoryTitle);
+        int result = noteCategoryService.editCategoryTitleById(categoryId,categoryTitle);
 
         if(result > 0) {
             respResult = RespResult.ok();

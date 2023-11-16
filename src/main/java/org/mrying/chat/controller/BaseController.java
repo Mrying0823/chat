@@ -39,4 +39,8 @@ public class BaseController {
     // 笔记专题服务
     @Resource
     protected NoteCategoryService noteCategoryService;
+
+    // 笔记服务
+    @Resource
+    protected NoteService noteService;
 }
