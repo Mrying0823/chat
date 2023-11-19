@@ -2,30 +2,6 @@
   <div class="nav" :class="store.getters.getDarkMode ? 'night-mode': 'darkcyan'">
     <ul>
       <li><router-link :to="{path: '/'}"><i class="fa fa-home"></i></router-link></li>
-      <li><router-link :to="{path: '/gpt/chatGPT'}"><i class="fa fa-comments-o"></i><span>ChatGPT </span></router-link></li>
-      <li class="nav-login" v-show="!isAvatarShow"><router-link :to="{path: '/user/login'}"><i class="fa fa-user"></i><span>登录</span></router-link></li>
-      <li class="nav-login" v-show="isAvatarShow">
-        <router-link :to="{path: '/'}">
-          <i class="fa fa-user"></i>
-          <el-avatar class="nav-login-avatar" shape="square" :style="`background:${extractColorByName(store.getters.getUser.name)}`">
-            {{ $store.getters.getUser.name }}
-          </el-avatar>
-        </router-link>
-        <ul class="sublevel menu">
-          <li @click="toggleDark"><a>
-            <el-switch
-                class="nav-darkMode-switch"
-                v-model="isDark"
-                inline-prompt
-                :active-icon="Sunny"
-                :inactive-icon="Moon"
-                style="--el-switch-on-color: #002B2E;"
-            />
-          </a></li>
-          <li @click="logout"><a style="cursor: pointer">注销</a></li>
-        </ul>
-      </li>
-      <li><router-link :to="{path: '/note/userNote'}"><i class="fa fa-book"></i><span>笔记</span></router-link></li>
       <li><a href="#"><i class="fa fa-link"></i><span>菜鸟教程 <i class="fa fa-chevron-down"></i></span></a>
         <div class="sublevel megamenu">
           <div class="holder-1">
@@ -192,6 +168,30 @@
           </div>
         </div>
       </li>
+      <li><router-link :to="{path: '/gpt/chatGPT'}"><i class="fa fa-comments-o"></i><span>ChatGPT </span></router-link></li>
+      <li class="nav-login" v-show="!isAvatarShow"><router-link :to="{path: '/user/login'}"><i class="fa fa-user"></i><span>登录</span></router-link></li>
+      <li class="nav-login" v-show="isAvatarShow">
+        <router-link :to="{path: '/'}">
+          <i class="fa fa-user"></i>
+          <el-avatar class="nav-login-avatar" shape="square" :style="`background:${extractColorByName(store.getters.getUser.name)}`">
+            {{ $store.getters.getUser.name }}
+          </el-avatar>
+        </router-link>
+        <ul class="sublevel menu">
+          <li @click="toggleDark"><a>
+            <el-switch
+                class="nav-darkMode-switch"
+                v-model="isDark"
+                inline-prompt
+                :active-icon="Sunny"
+                :inactive-icon="Moon"
+                style="--el-switch-on-color: #002B2E;"
+            />
+          </a></li>
+          <li @click="logout"><a style="cursor: pointer">注销</a></li>
+        </ul>
+      </li>
+      <li><router-link :to="{path: '/note/userNote'}"><i class="fa fa-book"></i><span>笔记</span></router-link></li>
     </ul>
   </div>
   <br>
