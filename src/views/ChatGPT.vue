@@ -5,33 +5,33 @@
     <el-aside class="chat-aside">
       <ChatGPTSidebar @tran-messageList="updateMessageList" @tran-conversationId="updateConversationId" :conversationId="conversationId"></ChatGPTSidebar>
     </el-aside>
-      <el-container class="chat-container-message">
-        <el-main class="chat-message">
-          <el-scrollbar ref="chat-scrollbar">
-            <ul ref="chat-ul">
-              <li v-for="item in items" :key="item.messageId" :class="item.messageDirection === 1? 'chat-reply':'chat-question'">
-                <div :class="item.messageDirection === 1? 'reply-info':'question-info'">
-                  <div
-                      v-html="item.html? item.html : item.content || ''"
-                      :class="{
-                        'reply-info-content': item.messageDirection === 1 && !this.$store.getters.getDarkMode,
-                        'night-mode-reply-info-content': item.messageDirection === 1 && this.$store.getters.getDarkMode,
-                        'question-info-content': item.messageDirection !== 1 && !this.$store.getters.getDarkMode,
-                        'night-mode-question-info-content': item.messageDirection !== 1 && this.$store.getters.getDarkMode
-                      }"
-                  />
-                </div>
-              </li>
-            </ul>
-          </el-scrollbar>
-        </el-main>
-        <el-footer class="chat-footer">
-          <div class="borderNone" :class="this.$store.getters.getDarkMode ? 'night-mode-chat-input': 'chat-input'">
-            <el-input class="message-input" type="textarea" v-model="message" @keydown="handleKeyDown" placeholder="请输入您的消息..." :autosize="{ minRows: 1, maxRows: 2}"></el-input>
-            <el-button type="text" @click="onSendMessage(message)" :disabled="generating" :loading="generating"><el-icon v-show="!generating"><Position /></el-icon></el-button>
-          </div>
-        </el-footer>
-      </el-container>
+    <el-container class="chat-container-message">
+      <el-main class="chat-message">
+        <el-scrollbar ref="chat-scrollbar">
+          <ul ref="chat-ul">
+            <li v-for="item in items" :key="item.messageId" :class="item.messageDirection === 1? 'chat-reply':'chat-question'">
+              <div :class="item.messageDirection === 1? 'reply-info':'question-info'">
+                <div
+                    v-html="item.html? item.html : item.content || ''"
+                    :class="{
+                      'reply-info-content': item.messageDirection === 1 && !this.$store.getters.getDarkMode,
+                      'night-mode-reply-info-content': item.messageDirection === 1 && this.$store.getters.getDarkMode,
+                      'question-info-content': item.messageDirection !== 1 && !this.$store.getters.getDarkMode,
+                      'night-mode-question-info-content': item.messageDirection !== 1 && this.$store.getters.getDarkMode
+                    }"
+                />
+              </div>
+            </li>
+          </ul>
+        </el-scrollbar>
+      </el-main>
+      <el-footer class="chat-footer">
+        <div class="borderNone" :class="this.$store.getters.getDarkMode ? 'night-mode-chat-input': 'chat-input'">
+          <el-input class="message-input" type="textarea" v-model="message" @keydown="handleKeyDown" placeholder="请输入您的消息..." :autosize="{ minRows: 1, maxRows: 2}"></el-input>
+          <el-button type="text" @click="onSendMessage(message)" :disabled="generating" :loading="generating"><el-icon v-show="!generating"><Position /></el-icon></el-button>
+        </div>
+      </el-footer>
+    </el-container>
   </el-container>
 </template>
 
@@ -111,18 +111,6 @@ export default {
         event.preventDefault();
         this.onSendMessage();
       }
-    },
-
-    getUuid() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (Math.random() * 16) | 0,
-            v = c === 'x' ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      })
-    },
-
-    getUser() {
-      return localStorage.getItem("user")
     },
 
     async onSendMessage(message) {
@@ -257,16 +245,6 @@ export default {
         });
       }
     }
-  },
-
-  mounted() {
-    console.log('mounted')
-    let user = this.getUser();
-    if (!user) {
-      console.log("No user found, creating new user")
-      localStorage.setItem("user", this.getUuid())
-    }
-    console.log('user:', this.getUser())
   }
 }
 </script>
