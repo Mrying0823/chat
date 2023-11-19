@@ -16,13 +16,15 @@ const store = createStore({
         // 会话过期时间
         sessionExpiryTime: null,
         // 夜间模式
-        darkMode: false
-
+        darkMode: false,
+        // 上一次选择的笔记
+        lastSelectedNote: ""
     },
     getters: {
         getUser: (state) => state.user,
         getLastSelectedConversation: (state) => state.lastSelectedConversation,
-        getDarkMode: (state) => state.darkMode
+        getDarkMode: (state) => state.darkMode,
+        getLastSelectedNote: state => state.lastSelectedNote
     },
     mutations: {
         updateUser: (state, user) => {
@@ -36,6 +38,9 @@ const store = createStore({
         },
         updateDarkMode(state, darkMode) {
             state.darkMode = darkMode;
+        },
+        updateLastSelectedNote(state, lastSelectedNote) {
+            state.lastSelectedNote = lastSelectedNote;
         }
     },
     actions: {
@@ -65,6 +70,7 @@ const store = createStore({
                         selectedConversationIndex: "",
                         messageList: []
                     });
+                    context.commit('updateLastSelectedNote',"");
                 }
             }, 10000);
         },
@@ -84,6 +90,9 @@ const store = createStore({
     },
     asyncDarkMode: (context, darkMode) => {
         context.commit('updateDarkMode', darkMode);
+    },
+    asyncLastSelectedNote: (context, lastSelectedNote) => {
+        context.commit('updateLastSelectedNote', lastSelectedNote)
     },
     plugins: [createPersistedState()]
 });

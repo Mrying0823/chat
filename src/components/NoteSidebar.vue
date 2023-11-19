@@ -44,12 +44,39 @@
         :with-header="false"
         direction="rtl"
         size="30%"
-        style="position: absolute;height: 92%;top: 8%;font-family: 'Source Code Pro Light', sans-serif;font-size: 14px"
+        style="position: absolute;height: 92%;top: 8%;font-family: 'Source Code Pro Light', sans-serif;font-size: 14px;color: white"
+        :style="{background: this.$store.getters.getDarkMode ? '#18392F' : '#00AAAD'}"
     >
       <el-icon v-show="!creating" class="icon-circle-plus" @click="createNewNote"><CirclePlus /></el-icon>
       <ul class="nav-ul">
-        <li v-for="(item,i) in noteList" :key="i" class="nav-li">
-          <div @click.prevent="openNote(item)"><el-icon class="icon-note-title"><Notebook /></el-icon>{{item.noteTitle}}<el-divider/></div>
+        <li v-for="(note,i) in noteList" :key="i" class="nav-li">
+          <div
+              @click.prevent="openNote(note.noteId,note.noteContent)"
+              :class="{
+                'conversation-active': selectedNoteIndex === note.noteId && !this.$store.getters.getDarkMode,
+                'night-mode-conversation-active': selectedNoteIndex === note.noteId && this.$store.getters.getDarkMode,
+                'conversation': !this.$store.getters.getDarkMode,
+                'night-mode-conversation': this.$store.getters.getDarkMode
+              }"
+          >
+            <el-icon class="icon-note-title">
+              <Notebook />
+            </el-icon>
+            <span class="span-noteTitle-length">{{note.noteTitle}}</span>
+            <!-- 会话名称修改输入框 -->
+            <el-input class="note-edit-title" :class="{'anti-transparent': this.$store.getters.getDarkMode}" v-if="selectedNoteIndex === note.noteId" v-show="editNoteConfirm" v-model="editedNoteTitle"></el-input>
+            <!-- 编辑图标 -->
+            <el-icon class="note-edit-pen" v-if="selectedNoteIndex === note.noteId" @click.stop="editClickForNote(note.noteTitle)" v-show="!deleteNoteConfirm && !editNoteConfirm"><EditPen /></el-icon>
+            <!-- 保存修改 -->
+            <el-icon class="note-edit-pen" v-if="selectedNoteIndex === note.noteId" v-show="editNoteConfirm" @click.stop="editNoteTitle(note.noteId,note.noteTitle)"><Check /></el-icon>
+            <!-- 删除图标 -->
+            <el-icon class="note-edit-pen" v-if="selectedNoteIndex === note.noteId" v-show="deleteNoteConfirm" @click.stop="deleteNote(note.noteId)"><Check /></el-icon>
+            <!-- 确认删除 -->
+            <el-icon class="note-delete" v-if="selectedNoteIndex === note.noteId" v-show="!deleteNoteConfirm && !editNoteConfirm" @click.stop="deleteClickForNote"><Delete /></el-icon>
+            <!-- 取消操作 -->
+            <el-icon class="note-delete" v-if="selectedNoteIndex === note.noteId" v-show="deleteNoteConfirm || editNoteConfirm" @click.stop="repeatClickForNote"><Close /></el-icon>
+          </div>
+          <el-divider/>
         </li>
       </ul>
     </el-drawer>
@@ -62,71 +89,147 @@ import {doPost, toGet} from "@/axios/httpRequest";
 
 export default {
   name: "NoteSidebar",
-  // props: ["conversationId"],
-
-/*  watch: {
-    conversationId: {
-      handler(newMessage) {
-
-        // 服务器端传来了新的 conversationId
-        if(this.selectedConversationIndex !== newMessage) {
-
-          const newConversation = {
-            conversationId: "",
-            userId: "",
-            conversationType: 0,
-            createTime: 0,
-            conversationName: "新建会话",
-            firstMessage: ""
-          }
-
-          newConversation.conversationId = newMessage;
-
-          // 使用 unshift 方法将新会话添加到列表的首位
-          this.conversationList.unshift(newConversation);
-
-          this.selectConversation(this.conversationList[0].conversationId);
-        }
-      },
-      // 这个选项可以在组件初始化时立即触发观察者
-      immediate: true,
-    }
-  },*/
 
   data() {
     return {
+      // 笔记标题修改后的名称
+      editedNoteTitle: "",
+      editNoteConfirm: false,
+      deleteNoteConfirm: false,
+      // 创建笔记中
+      creating: false,
+      // 笔记 Id
+      selectedNoteIndex: "",
       // 抽屉里的笔记
-      noteList: [{
-        noteId: "",
-        noteTitle: "测试 1",
-        noteContent: "",
-        createTime: "",
-        userId: "",
-        categoryId: ""
-      }],
+      noteList: [],
       // 打开抽屉
       openDrawer: false,
       // 笔记专题修改后的名称
       editedTitle: "",
       editConfirm: false,
       deleteConfirm: false,
-      noteCategoryList: [{
-        categoryId: "",
-        userId: "",
-        createTime: 0,
-        categoryTitle: "新建笔记专题",
-      }],
-/*      messageList: [{
-        "messageId": "",
-        "messageDirection": 0,
-        "conversationId": "",
-        "content": "",
-        "createTime": 0
-      }],*/
+      noteCategoryList: [],
       selectedNoteCategoryIndex: "",
     };
   },
   methods: {
+    // eslint-disable-next-line no-unused-vars
+    openNote(noteId,noteContent) {
+      this.selectNote(noteId);
+
+      this.$store.commit("updateLastSelectedNote",noteContent);
+
+      this.openDrawer = false;
+    },
+    // 取消编辑或删除操作
+    repeatClickForNote() {
+      if(this.editNoteConfirm) {
+        this.editNoteConfirm = !this.editNoteConfirm;
+      }
+
+      if(this.deleteNoteConfirm) {
+        this.deleteNoteConfirm = !this.deleteNoteConfirm;
+      }
+    },
+    // 点击删除图标
+    deleteClickForNote() {
+      this.deleteNoteConfirm = true;
+    },
+    // 点击编辑图标
+    editClickForNote(currentTitle) {
+      // 获取当前笔记专题名称
+      this.editedNoteTitle = currentTitle;
+      this.editNoteConfirm = true;
+    },
+    // 修改笔记标题
+    editNoteTitle(index,currentTitle) {
+      let this_ = this;
+
+      if(currentTitle === this_.editedNoteTitle) {
+        this_.repeatClickForNote();
+        return;
+      }
+
+      if(this_.editedNoteTitle && index) {
+        doPost("/note/editNoteTitle",{noteId: index, noteTitle: this_.editedNoteTitle}).then(response => {
+          if(response && response.data.code === 200) {
+            this_.noteList.forEach(function (note) {
+              if(note.noteId === index) {
+                note.noteTitle = this_.editedNoteTitle;
+              }
+            })
+          }
+        });
+      }else {
+        this_.repeatClickForNote();
+        this_.$message({
+          type: "error",
+          center: true,
+          message: "笔记标题不为空"
+        })
+      }
+      this_.repeatClickForNote();
+    },
+    // 删除笔记
+    deleteNote(index) {
+      doPost("/note/deleteNote",{noteId: index}).then(response => {
+        if(response && response.data.code === 200) {
+
+          // 从 noteList 中过滤掉对应的笔记
+          this.noteList = this.noteList.filter(note => note.noteId !== index);
+        }
+      });
+    },
+    // 获取笔记专题下的笔记列表
+    getNoteListByCategoryId() {
+      toGet("/note/getNote",{categoryId: this.selectedNoteCategoryIndex}).then(response => {
+        if(response && response.data.code === 200) {
+          this.noteList = response.data.list;
+        }else {
+          this.$message({
+            type: "info",
+            center: true,
+            message: response.data.msg
+          });
+        }
+      });
+    },
+    // 切换笔记
+    selectNote(index) {
+
+      if (this.selectedNoteIndex !== index) {
+        // 自动切换笔记重置图标
+        this.deleteNoteConfirm = false;
+
+        this.editNoteConfirm = false;
+      }
+
+      this.selectedNoteIndex = index;
+    },
+    // 创建新的笔记
+    createNewNote() {
+      this.creating = true;
+      doPost("/note/createNewNote", {categoryId: this.selectedNoteCategoryIndex}).then(response => {
+        if(response && response.data.code === 200) {
+          const newNote = {
+            noteId: response.data.noteId,
+            noteTitle: "新建笔记",
+            noteContent: "",
+            createTime: "",
+            userId: "",
+            categoryId: this.selectedNoteCategoryIndex
+          }
+
+          // 使用 unshift 方法将新笔记添加到列表的首位
+          this.noteList.unshift(newNote);
+
+          this.selectNote(this.noteList[0].noteId);
+
+          this.creating = false;
+        }
+      });
+    },
+
     // 修改笔记专题名称
     editNoteCategoryName(index,currentName) {
       let this_ = this;
@@ -168,7 +271,7 @@ export default {
     },
     // 点击编辑图标
     editClick(currentTitle) {
-      // 获取当前会话名称
+      // 获取当前笔记专题名称
       this.editedTitle = currentTitle;
       this.editConfirm = true;
     },
@@ -177,10 +280,8 @@ export default {
       doPost("/note/deleteNoteCategory",{categoryId: index}).then(response => {
         if(response && response.data.code === 200) {
 
-          // 从 conversationList 中过滤掉对应的会话
+          // 从 noteCategoryList 中过滤掉对应的会话
           this.noteCategoryList = this.noteCategoryList.filter(category => category.categoryId !== index);
-
-          this.selectCategoryNote("");
         }
       });
     },
@@ -188,7 +289,7 @@ export default {
     deleteClick() {
       this.deleteConfirm = true;
     },
-    // 切换会话
+    // 切换笔记专题
     selectCategoryNote(index) {
 
       if(this.selectedNoteCategoryIndex !== index) {
@@ -203,39 +304,9 @@ export default {
       if(!this.editConfirm && !this.deleteConfirm) {
         // 打开抽屉
         this.openDrawer = true;
+
+        this.getNoteListByCategoryId();
       }
-
-      // this.$emit("tran-conversationId",index);
-
-/*      if(index === this.lastSelectedConversation.selectedConversationIndex && this.lastSelectedConversation.messageList) {
-        this.$emit("tran-messageList",this.lastSelectedConversation.messageList);
-      }else if(index) {
-
-        doPost("/chatgpt/getMessages", {conversationId: index}).then(response => {
-          if (response && response.data.code === 200) {
-            this.messageList = response.data.list;
-            // 在组件中触发 mutation 来更新数据
-            this.$store.commit('updateLastSelectedConversation', {selectedConversationIndex: index,messageList: this.messageList});
-            this.$emit("tran-messageList", this.messageList);
-          }
-        });
-      }else {
-
-        // 新建会话
-        this.$emit("tran-messageList",[]);
-      }*/
-
-/*      if(index) {
-
-        doPost("/chatgpt/getMessages", {conversationId: index}).then(response => {
-          if (response && response.data.code === 200) {
-            this.messageList = response.data.list;
-            // 在组件中触发 mutation 来更新数据
-            this.$store.commit('updateLastSelectedConversation', {selectedConversationIndex: index,messageList: this.messageList});
-            this.$emit("tran-messageList", this.messageList);
-          }
-        });
-      }*/
     },
     createNoteCategory(event) {
       // 使按钮失焦
@@ -262,18 +333,7 @@ export default {
       });
     },
   },
-/*  computed: {
-    lastSelectedNoteCategory() {
-      return this.$store.getters.getLastSelectedNoteCategory;
-    }
-  },*/
   mounted() {
-
-    // this.selectConversation(this.$store.getters.getLastSelectedConversation.selectedConversationIndex);
-
-    // 启动计时器
-    // this.$store.dispatch('startSessionExpiryTimer');
-
     toGet("/note/getNoteCategory").then(response => {
       if(response && response.data.code === 200) {
         this.noteCategoryList = response.data.list;
@@ -338,7 +398,7 @@ export default {
 
 .icon-note-title {
   vertical-align: middle; /* 垂直居中对齐 */
-  bottom: 0.35vh;
+  top: 0.1vh;
   margin-right: 2%; /* 调整图标与文本之间的间距 */
   font-size: 14px;
 }
@@ -347,9 +407,50 @@ export default {
   color: #cecece;
   cursor: pointer;
   font-size: 16px;
+  left: 0.5vw;
 }
 
 .icon-circle-plus:hover{
   color: black;
+}
+
+.note-edit-title {
+  position: fixed;
+  width: 21vw;
+  height: auto;
+  left: 73.2vw;
+}
+
+.note-edit-pen {
+  vertical-align: middle; /* 垂直居中对齐 */
+  position: fixed;
+  right: 4vw;
+  font-size: 16px;
+  color: #cecece;
+}
+
+.note-edit-pen:hover,
+.note-edit-pen:active {
+  color: white;
+}
+
+.note-delete {
+  vertical-align: middle; /* 垂直居中对齐 */
+  position: fixed;
+  right: 2vw;
+  font-size: 16px;
+  color: #cecece;
+}
+
+.note-delete:hover,
+.note-delete:active {
+  color: white;
+}
+
+.span-noteTitle-length {
+  width: 21vw; /* 适应你的容器宽度 */
+  overflow: hidden; /* 隐藏溢出的内容 */
+  white-space: nowrap; /* 防止文本换行 */
+  text-overflow: ellipsis; /* 用省略号表示溢出内容 */
 }
 </style>
