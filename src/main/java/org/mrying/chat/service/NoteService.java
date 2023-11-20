@@ -20,4 +20,7 @@ public interface NoteService {
 
     // 根据 noteId 查询笔记并修改标题
     int editNoteTitleById(String noteId,String noteTitle);
+
+    // 更新笔记内容
+    int updateNoteContentById(String noteId,String noteContent);
 }

@@ -40,4 +40,7 @@ public interface NoteMapper {
 
     // 根据笔记专题 Id 查询其所有关联笔记
     List<Note> selectNoteByCategoryId(String categoryId);
+
+    // 更新笔记内容
+    int updateNoteContentById(@Param("noteId") String noteId, @Param("noteContent") String noteContent);
 }

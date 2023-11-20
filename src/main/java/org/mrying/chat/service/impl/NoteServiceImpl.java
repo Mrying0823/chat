@@ -39,7 +39,7 @@ public class NoteServiceImpl implements NoteService {
         // 保存创建的笔记专题
         noteMapper.insertNewNote(note);
         // 返回笔记专题 ID
-        return note.getCategoryId();
+        return note.getNoteId();
     }
 
     // 获取笔记专题下的所有笔记
@@ -58,5 +58,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public int editNoteTitleById(String noteId, String noteTitle) {
         return noteMapper.updateNoteTitleById(noteId,noteTitle);
+    }
+
+    // 更新笔记内容
+    @Override
+    public int updateNoteContentById(String noteId, String noteContent) {
+        return noteMapper.updateNoteContentById(noteId,noteContent);
     }
 }

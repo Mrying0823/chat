@@ -104,4 +104,26 @@ public class NoteController extends BaseController {
 
         return respResult;
     }
+
+    // 更新笔记内容
+    @ApiOperation(value = "更新笔记内容",notes = "根据 noteId 更新笔记内容")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "noteId",value = "笔记 Id",required = true),
+            @ApiImplicitParam(name = "noteContent",value = "笔记内容",required = true)
+    })
+    @PostMapping("/note/updateNoteContent")
+    public RespResult updateNoteContent(@RequestParam("noteId") String noteId,
+                                        @RequestParam("noteContent") String noteContent) {
+        RespResult respResult = RespResult.fail();
+
+        int result = noteService.updateNoteContentById(noteId,noteContent);
+
+        if(result > 0) {
+            respResult = RespResult.ok();
+        }else {
+            respResult.setMsg("服务繁忙，请稍后重试");
+        }
+
+        return respResult;
+    }
 }

@@ -145,7 +145,14 @@
   <!-- 根据 noteId 修改笔记名称 -->
   <update id="updateNoteTitleById">
     update tbl_note
-    set note_title = #{noteTitle,jdbcType=VARCHAR},
+    set note_title = #{noteTitle,jdbcType=VARCHAR}
+    where note_id = #{noteId,jdbcType=CHAR}
+  </update>
+
+  <!-- 更新笔记内容 -->
+  <update id="updateNoteContentById">
+    update tbl_note
+    set note_content = #{noteContent,jdbcType=LONGVARCHAR}
     where note_id = #{noteId,jdbcType=CHAR}
   </update>
 
@@ -154,6 +161,6 @@
     select
     <include refid="Base_Column_List" />
     from tbl_note
-    where note_id = #{noteId,jdbcType=CHAR}
+    where category_id = #{categoryId,jdbcType=CHAR}
   </select>
 </mapper>
