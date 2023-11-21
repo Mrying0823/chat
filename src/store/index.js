@@ -18,7 +18,10 @@ const store = createStore({
         // 夜间模式
         darkMode: false,
         // 上一次选择的笔记
-        lastSelectedNote: ""
+        lastSelectedNote: {
+            noteId: "",
+            noteContent: ""
+        }
     },
     getters: {
         getUser: (state) => state.user,
@@ -70,7 +73,10 @@ const store = createStore({
                         selectedConversationIndex: "",
                         messageList: []
                     });
-                    context.commit('updateLastSelectedNote',"");
+                    context.commit('updateLastSelectedNote',{
+                        noteId: "",
+                        noteContent: ""
+                    });
                 }
             }, 10000);
         },
@@ -86,6 +92,10 @@ const store = createStore({
                 messageList: []
             });
             context.commit('updateDarkMode', false);
+            context.commit('updateLastSelectedNote',{
+                noteId: "",
+                noteContent: ""
+            });
         }
     },
     asyncDarkMode: (context, darkMode) => {
