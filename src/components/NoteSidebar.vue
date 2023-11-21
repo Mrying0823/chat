@@ -64,7 +64,7 @@
             </el-icon>
             <span class="span-noteTitle-length">{{note.noteTitle}}</span>
             <!-- 会话名称修改输入框 -->
-            <el-input class="note-edit-title" :class="{'anti-transparent': this.$store.getters.getDarkMode}" v-if="selectedNoteIndex === note.noteId" v-show="editNoteConfirm" v-model="editedNoteTitle"></el-input>
+            <el-input class="note-edit-title" :class="{'anti-transparent': this.$store.getters.getDarkMode}" v-if="selectedNoteIndex === note.noteId" v-show="editNoteConfirm" v-model="editedNoteTitle" @click.stop></el-input>
             <!-- 编辑图标 -->
             <el-icon class="note-edit-pen" v-if="selectedNoteIndex === note.noteId" @click.stop="editClickForNote(note.noteTitle)" v-show="!deleteNoteConfirm && !editNoteConfirm"><EditPen /></el-icon>
             <!-- 保存修改 -->
@@ -117,7 +117,7 @@ export default {
     openNote(noteId,noteContent) {
       this.selectNote(noteId);
 
-      this.$store.commit("updateLastSelectedNote",noteContent);
+      this.$store.commit("updateLastSelectedNote", {noteId: noteId, noteContent: noteContent});
 
       this.openDrawer = false;
     },
