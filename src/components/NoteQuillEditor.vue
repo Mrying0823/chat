@@ -1,39 +1,29 @@
 <template>
-  <el-container>
-    <el-main>
-      <QuillEditor
-          style="height: 74vh"
-          v-model:content="content"
-          ref="myQuillEditor"
-          :options="editorOption"
-          contentType="html"
-      >
-      </QuillEditor>
-    </el-main>
-    <el-footer class="chat-footer">
-      <div class="borderNone" :class="this.$store.getters.getDarkMode ? 'night-mode-chat-input': 'chat-input'">
-        <el-input class="message-input" type="textarea" v-model="message" @keydown="handleKeyDown" placeholder="你可以向 chatgpt 提问..." :autosize="{ minRows: 1, maxRows: 2}"></el-input>
-        <el-button type="text" @click="onSendMessage(message)" :disabled="generating" :loading="generating"><el-icon v-show="!generating"><Position /></el-icon></el-button>
-      </div>
-    </el-footer>
-  </el-container>
+  <QuillEditor
+      style="height: 74vh"
+      v-model:content="content"
+      ref="myQuillEditor"
+      :options="editorOption"
+      contentType="html"
+  >
+  </QuillEditor>
 </template>
 
 <script setup>
-import { QuillEditor } from '@vueup/vue-quill';
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
-// eslint-disable-next-line no-unused-vars
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import store from "@/store";
-// eslint-disable-next-line no-unused-vars
-import { debounce } from 'lodash';
-import {ElMessage} from "element-plus";
-import {doPost} from "@/axios/httpRequest";
 // marked 用于将 markdown 格式文本转为 html
 import * as marked from "marked";
 // highlight 用于代码高亮
 import hljs from 'highlight.js';
 import 'highlight.js/styles/monokai-sublime.css';
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+// eslint-disable-next-line no-unused-vars
+import {computed, onBeforeUnmount, onMounted, ref, toRaw, watch, watchEffect} from "vue";
+import store from "@/store";
+// eslint-disable-next-line no-unused-vars
+import { debounce } from 'lodash';
+import {ElMessage} from "element-plus";
+import {doPost} from "@/axios/httpRequest";
 import Quill from 'quill';
 import Delta from 'quill-delta';
 
@@ -210,9 +200,9 @@ Quill.register(font, true);
 
 const saveNote = () => {
 
-  const text = myQuillEditor.value.getHTML();
+  const text = toRaw(myQuillEditor.value).getQuill().root.innerHTML;
   const noteId = store.getters.getLastSelectedNote.noteId;
-
+  text.concat("\n");
   doPost("/note/updateNoteContent",{noteId: noteId, noteContent: text}).then(response => {
     if(response && response.data.code === 200) {
       store.commit("updateLastSelectedNote", {noteId: noteId, noteContent: text});
@@ -259,10 +249,6 @@ const editorOption = {
       // 关闭视觉匹配，保留原始格式
       matchVisual: false,
     },
-    // 语法高亮
-    syntax: {
-      highlight: text => hljs.highlightAuto(text).value
-    },
     history: {
       delay: 2000,
       maxStack: 500,
@@ -273,21 +259,6 @@ const editorOption = {
   theme: 'snow'
 };
 
-const noteContent = computed(() => {
-  return marked.parse(store.state.lastSelectedNote.noteContent);
-});
-
-// 防抖输入函数，用户暂停输入一段时间后 setHTML
-const debouncedSetHTML = debounce((newVal) => {
-  myQuillEditor.value.setHTML(newVal);
-  // 使用 console.log 打印出实例对象可以看到它的使用方法
-  myQuillEditor.value.getQuill().setSelection(newVal.length,newVal.length);
-}, 500);
-
-watch(noteContent, (newVal) => {
-  debouncedSetHTML(newVal);
-}, { deep: true ,immediate: true });
-
 const initButton = () => {
   const editorButton = document.querySelector('.ql-save');
   if (editorButton) {
@@ -295,11 +266,33 @@ const initButton = () => {
   }
 };
 
+// 接收来自后端的 gpt 的信息
+// eslint-disable-next-line no-unused-vars
+const props = defineProps(['gptMessage']);
+
 onMounted(() => {
 
-  const noteContent = store.getters.getLastSelectedNote.noteContent;
+  const noteContent = computed(() => {
+    return store.state.lastSelectedNote.noteContent;
+  });
 
-  myQuillEditor.value.setHTML(noteContent);
+  // 防抖输入函数，用户暂停输入一段时间后 setHTML
+  const debouncedSetHTML = debounce((newVal) => {
+    toRaw(myQuillEditor.value).setHTML(newVal);
+    // 使用 console.log 打印出实例对象可以看到它的使用方法
+    myQuillEditor.value.getQuill().setSelection(newVal.length, newVal.length);
+  }, 300);
+
+  watch(noteContent, (newVal) => {
+    debouncedSetHTML(newVal);
+  }, { deep: true ,immediate: true });
+
+  // 等待富文本实例加载完成
+  // 子组件中的 setup 函数只能执行一次，所以组件中的值更新时，子组件就不听话了
+  watchEffect(() => {
+    let gptMessage = marked.parse(props.gptMessage);
+    toRaw(myQuillEditor.value).setHTML(gptMessage);
+  });
 
   // 工具栏鼠标悬停提示
   for (let item of titleConfig) {
@@ -314,9 +307,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.borderNone >>>.el-textarea__inner {
-  border: 0;
-  resize: none;
-  box-shadow: 0 0 0 0;
-}
 </style>
