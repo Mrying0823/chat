@@ -11,7 +11,9 @@ import java.util.List;
 public interface ChatgptService {
 
     // 向 chatgpt 提问
-    SseEmitter sendMsgBySse(Boolean publicApi,String conversationId,String prompt);
+    SseEmitter sendMsgBySse(Boolean usePublicApi,String conversationId,String prompt);
+
+    SseEmitter sendMsgBySseForNote(Boolean usePublicApi,String prompt);
 
     // 根据用户给的提示，chatgpt 生成 5 条相关问题
     List<String> queryQuestionByChatgpt(String prompt);

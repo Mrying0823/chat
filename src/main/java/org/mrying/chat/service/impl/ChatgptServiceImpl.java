@@ -27,7 +27,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -111,83 +110,114 @@ public class ChatgptServiceImpl implements ChatgptService {
         chatgptMessageMapper.insertCurrentMessage(message);
     }
 
-    // 向 chatgpt 提问
-    @Transactional
-    @Override
-    public synchronized SseEmitter sendMsgBySse(Boolean usePublicApi, String conversationId, String prompt) {
-
-        // 查询用户
-        User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
-
-        // 1、设置 api-key
-        String key;
-
-        // 选择使用公共 api
-        if(usePublicApi) {
-            // 检查 api 使用次数
-            if(user.getUserTokenCount() > 0) {
-                key = chatgptConfiguration.getGptKey();
-            }else {
-                throw new NoTokenCountException("api 请求次数不足");
+    // 私有方法，用于获取 API Key
+    private String getKey(Boolean usePublicApi, User user) {
+        if (usePublicApi) {
+            if (user.getUserTokenCount() > 0) {
+                return chatgptConfiguration.getGptKey();
+            } else {
+                throw new NoTokenCountException("API请求次数不足");
             }
-
-        }else {
-            // 使用个人 api
-            key = user.getUserApiKey();
+        } else {
+            return user.getUserApiKey();
         }
+    }
 
-        // 2、设置代理
-        // 国内需要代理
-        // Proxy proxy = Proxys.http("192.168.56.104", 7890);
-
-        // 3、借助 SDK 工具，实例化 ChatGPTStream 工具类对象
-        // 多 KEY 自动轮询 .apiKeyList()
-        ChatGPTStream chatGPTStream = ChatGPTStream.builder()
+    // 私有方法，用于初始化 ChatGPTStream
+    private ChatGPTStream initializeChatGPTStream(String key) {
+        return ChatGPTStream.builder()
                 .timeout(50)
                 .apiKey(key)
                 .apiHost(chatgptConfiguration.getHost())
                 .build()
                 .init();
+    }
 
-        // 4、实例化流式输出类，设置监听，使得在所有消息输出完成后回调
-        // 设置一个超时时间为负无穷大（-1），永不超时，一直等待直到操作完成
-        // 有限时间会导致长回答生成中断，服务器端回调前单方面中断，报错 ResponseBodyEmitter has already completed
-        SseEmitter sseEmitter = new SseEmitter(-1L);
-        GptEventSourceListener listener = new GptEventSourceListener(sseEmitter);
+    // 私有方法，用于准备 SseEmitter
+    private SseEmitter prepareSseEmitter() {
+        return new SseEmitter(-1L);
+    }
 
-        // 5、加入历史消息记录，提供上下文信息
+    // 私有方法，用于准备消息列表
+    private List<Message> prepareMessages(String conversationId, String prompt) {
         List<Message> messages = conversationId != null ?
-                transform(chatgptMessageMapper.selectMessagesByConversationId(conversationId,Constants.MESSAGE_LIMIT_NUM)) : new ArrayList<>();
+                transform(chatgptMessageMapper.selectMessagesByConversationId(conversationId, Constants.MESSAGE_LIMIT_NUM)) : new ArrayList<>();
+        messages.add(Message.of(prompt));
+        return messages;
+    }
 
-        // 6、加入本次提问问题
-        Message message = Message.of(prompt);
-        messages.add(message);
-
-        ChatCompletion chatCompletion = ChatCompletion.builder()
+    // 私有方法，用于构建 ChatCompletion 对象
+    private ChatCompletion buildChatCompletion(List<Message> messages) {
+        return ChatCompletion.builder()
                 .messages(messages)
                 .model(ChatCompletion.Model.GPT_3_5_TURBO.getName())
                 .maxTokens(8192)
                 .build();
+    }
 
-        // 7、设置完成时的回调函数
+    // 私有方法，用于创建 GptEventSourceListener
+    private GptEventSourceListener createListener(SseEmitter sseEmitter, Boolean usePublicApi, User user, String conversationId, String prompt) {
+        GptEventSourceListener listener = new GptEventSourceListener(sseEmitter);
+
         listener.setOnComplete(msg -> {
-            // 保存历史信息
-            saveCurrentMessage(conversationId,prompt,Constants.DIRECTION_QUESTION);
-            saveCurrentMessage(conversationId,msg, Constants.DIRECTION_ANSWER);
+            if(conversationId != null) {
+                saveCurrentMessage(conversationId, prompt, Constants.DIRECTION_QUESTION);
+                saveCurrentMessage(conversationId, msg, Constants.DIRECTION_ANSWER);
+            }
 
-            if(usePublicApi) {
-                user.setUserTokenCount(user.getUserTokenCount()-1);
-                if(userMapper.updateUserTokenCount(user) <= 0) {
-                    throw new RuntimeException("扣除公用 api 使用次数失败");
+            if (usePublicApi) {
+                user.setUserTokenCount(user.getUserTokenCount() - 1);
+                if (userMapper.updateUserTokenCount(user) <= 0) {
+                    throw new RuntimeException("扣除公用API使用次数失败");
                 }
             }
-            SseHelper.send(sseEmitter,"[DONE]");
+
+            SseHelper.send(sseEmitter, "[DONE]");
             SseHelper.complete(sseEmitter);
             System.out.println(msg);
         });
 
-        // 8、提问
-        chatGPTStream.streamChatCompletion(chatCompletion,listener);
+        return listener;
+    }
+
+    // 向 chatgpt 提问
+    @Transactional
+    @Override
+    public synchronized SseEmitter sendMsgBySse(Boolean usePublicApi, String conversationId, String prompt) {
+        User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
+
+        String key = getKey(usePublicApi, user);
+
+        ChatGPTStream chatGPTStream = initializeChatGPTStream(key);
+        SseEmitter sseEmitter = prepareSseEmitter();
+
+        List<Message> messages = prepareMessages(conversationId, prompt);
+
+        ChatCompletion chatCompletion = buildChatCompletion(messages);
+
+        GptEventSourceListener listener = createListener(sseEmitter, usePublicApi, user, conversationId, prompt);
+
+        chatGPTStream.streamChatCompletion(chatCompletion, listener);
+
+        return sseEmitter;
+    }
+
+    @Override
+    public SseEmitter sendMsgBySseForNote(Boolean usePublicApi, String prompt) {
+        User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
+
+        String key = getKey(usePublicApi, user);
+
+        ChatGPTStream chatGPTStream = initializeChatGPTStream(key);
+        SseEmitter sseEmitter = prepareSseEmitter();
+
+        List<Message> messages = prepareMessages(null, prompt);
+
+        ChatCompletion chatCompletion = buildChatCompletion(messages);
+
+        GptEventSourceListener listener = createListener(sseEmitter, usePublicApi, user, null, prompt);
+
+        chatGPTStream.streamChatCompletion(chatCompletion, listener);
 
         return sseEmitter;
     }
@@ -237,67 +267,23 @@ public class ChatgptServiceImpl implements ChatgptService {
         return chatGPT.chatCompletion(chatCompletion);
     }
 
-    // 根据用户给的提示，chatgpt 生成 5 条相关问题
-    @Override
-    public List<String> queryQuestionByChatgpt(String prompt) {
-
-        // 查询用户
+    // 私有方法，用于处理 chatgpt 相关问题的通用逻辑
+    private List<String> processChatgptQuestions(String prompt, boolean refresh) {
         User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
-
         String key = RedisKey.KEY_USER_QUESTION.concat(user.getUserId()).concat(prompt);
 
         prompt = prompt.concat("，请给出 5 条相关问题");
 
-        // 问题列表
-        List<String> questions;
-
-        if(Objects.requireNonNull(stringRedisTemplate.opsForList().range(key, 0, -1)).isEmpty()) {
-            List<Message> messages = new ArrayList<>();
-
-            Message message = Message.of(prompt);
-            messages.add(message);
-            messages.add(Message.ofSystem("你是一名教师，你现在要为一个想要提问但是不知道问什么的学生提供相关题目"));
-
-            ChatCompletionResponse response = postChatgpt(messages);
-
-            Message res = response.getChoices().get(0).getMessage();
-
-            // 问题列表
-            questions = extractQuestions(res.getContent());
-
-            stringRedisTemplate.opsForList().leftPushAll(key,questions.toArray(new String[0]));
-            stringRedisTemplate.expire(key,1, TimeUnit.HOURS);
-        }else {
-            // 问题列表
-            questions = stringRedisTemplate.opsForList().range(key, 0, 10);
-        }
-        return questions;
-    }
-
-    // 根据用户给的提示，chatgpt 生成 5 条更专业的问题
-    @Override
-    public List<String> refreshQuestionByChatgpt(String prompt) {
-        // 查询用户
-        User user = userMapper.selectUserById(SecurityContextHolderUtils.getUserId());
-
-        String key = RedisKey.KEY_USER_QUESTION.concat(user.getUserId()).concat(prompt);
-
-        prompt = prompt.concat("，请给出 5 条相关问题");
-
-        // 问题列表
         List<String> questions;
 
         List<Message> messages = new ArrayList<>();
 
-        List<String> redisQuestioList = stringRedisTemplate.opsForList().range(key,0,-1);
+        List<String> redisQuestionList = stringRedisTemplate.opsForList().range(key, 0, -1);
 
-        if (redisQuestioList != null) {
-            for (String question : redisQuestioList) {
+        if (refresh && redisQuestionList != null) {
+            for (String question : redisQuestionList) {
                 // 加入上下文消息列表
-                messages.add(
-                        // gpt 发送的消息
-                        Message.ofAssistant(question)
-                );
+                messages.add(Message.ofAssistant(question));
             }
         }
 
@@ -309,12 +295,21 @@ public class ChatgptServiceImpl implements ChatgptService {
 
         Message res = response.getChoices().get(0).getMessage();
 
-        // 问题列表
         questions = extractQuestions(res.getContent());
 
-        stringRedisTemplate.opsForList().leftPushAll(key,questions.toArray(new String[0]));
-        stringRedisTemplate.expire(key,1, TimeUnit.HOURS);
+        stringRedisTemplate.opsForList().leftPushAll(key, questions.toArray(new String[0]));
+        stringRedisTemplate.expire(key, 1, TimeUnit.HOURS);
 
         return questions;
+    }
+
+    @Override
+    public List<String> queryQuestionByChatgpt(String prompt) {
+        return processChatgptQuestions(prompt, false);
+    }
+
+    @Override
+    public List<String> refreshQuestionByChatgpt(String prompt) {
+        return processChatgptQuestions(prompt, true);
     }
 }

@@ -16,7 +16,7 @@ import java.util.Map;
  * @since 2023/10/14 16:27
  */
 
-@CrossOrigin(value = "http://localhost:8080/gpt/chatGPT")
+@CrossOrigin(value = {"http://localhost:8080/gpt/chatGPT", "http://localhost:8080/note/userNote"})
 @Api(tags = "ChatGPT 请求相关")
 @RequestMapping("/v1")
 @RestController
@@ -36,6 +36,19 @@ public class ChatgptController extends BaseController {
                            @RequestParam("prompt") String prompt) {
 
         return chatgptService.sendMsgBySse(usePublicApi,conversationId,prompt);
+    }
+
+    // chatgpt 流式对话配合 Spring SseEmitter 使用
+    @ApiOperation(value = "chatgpt 流式对话，笔记用",notes = "chatgpt 流式对话配合 Spring SseEmitter，笔记用")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "usePublicApi", value = "使用公用 Api-Key", required = true),
+            @ApiImplicitParam(name = "prompt", value = "提问", required = true)
+    })
+    @GetMapping(path = "/chatgpt/chatForNote",produces="text/event-stream;charset=utf-8")
+    public SseEmitter chatForNote(@RequestParam("usePublicApi") Boolean usePublicApi,
+                           @RequestParam("prompt") String prompt) {
+
+        return chatgptService.sendMsgBySseForNote(usePublicApi,prompt);
     }
 
     @ApiOperation(value = "chatgpt 流式对话",notes = "chatgpt 流式对话配合 Spring SseEmitter")
