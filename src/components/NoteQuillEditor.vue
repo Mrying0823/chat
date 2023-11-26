@@ -26,6 +26,8 @@ import {ElMessage} from "element-plus";
 import {doPost} from "@/axios/httpRequest";
 import Quill from 'quill';
 import Delta from 'quill-delta';
+// eslint-disable-next-line no-unused-vars
+import context from "@vueup/vue-quill/dist/vue-quill.esm-browser";
 
 const Clipboard = Quill.import("modules/clipboard");
 
@@ -253,6 +255,11 @@ const editorOption = {
       delay: 2000,
       maxStack: 500,
       userOnly: true
+    },
+    syntax: {
+      highlight: text => {
+        return hljs.highlightAuto(text).value; // 这里就是代码高亮需要配置的地方
+      }
     }
   },
   placeholder: "请输入正文",
@@ -269,6 +276,8 @@ const initButton = () => {
 // 接收来自后端的 gpt 的信息
 // eslint-disable-next-line no-unused-vars
 const props = defineProps(['gptMessage']);
+
+const emits = defineEmits(['msg']);
 
 onMounted(() => {
 
@@ -290,8 +299,12 @@ onMounted(() => {
   // 等待富文本实例加载完成
   // 子组件中的 setup 函数只能执行一次，所以组件中的值更新时，子组件就不听话了
   watchEffect(() => {
+    const noteContent = store.getters.getLastSelectedNote.noteContent;
     let gptMessage = marked.parse(props.gptMessage);
-    toRaw(myQuillEditor.value).setHTML(gptMessage);
+    toRaw(myQuillEditor.value).setHTML(noteContent.concat(gptMessage));
+    // context.emit("noteContent",toRaw(myQuillEditor.value).getQuill().root.innerHTML);
+    // defineEmits("noteContent",toRaw(myQuillEditor.value).getQuill().root.innerHTML);
+    emits('msg',{noteContent: toRaw(myQuillEditor.value).getQuill().root.innerHTML});
   });
 
   // 工具栏鼠标悬停提示

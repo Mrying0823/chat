@@ -6,7 +6,7 @@
     </el-aside>
     <el-container>
       <el-main>
-        <NoteQuillEditor class="note-body" :gptMessage="gptMessage"/>
+        <NoteQuillEditor class="note-body" :gptMessage="gptMessage" @msg="getNoteContent"/>
       </el-main>
       <el-footer class="chat-footer">
         <div class="borderNone" :class="this.$store.getters.getDarkMode ? 'night-mode-chat-input': 'chat-input'">
@@ -29,6 +29,8 @@ import hljs from 'highlight.js';
 import qs from "qs";
 import {EventSourcePolyfill} from "event-source-polyfill";
 import store from "@/store";
+import {doPost} from "@/axios/httpRequest";
+import {ElMessage} from "element-plus";
 
 // 设置 marked 的选项及配置
 marked.setOptions({
@@ -48,10 +50,36 @@ export default {
     return {
       generating: false,
       message: "",
-      gptMessage: ""
+      gptMessage: "",
+      noteContent: ""
     }
   },
   methods: {
+    getNoteContent(msg) {
+      this.noteContent = msg.noteContent;
+    },
+
+    autoSaveNote() {
+      const noteId = store.getters.getLastSelectedNote.noteId;
+      this.noteContent.concat("\n");
+      doPost("/note/updateNoteContent",{noteId: noteId, noteContent: this.noteContent}).then(response => {
+        if(response && response.data.code === 200) {
+          store.commit("updateLastSelectedNote", {noteId: noteId, noteContent: this.noteContent});
+          ElMessage({
+            message: '自动保存',
+            type: 'success',
+            center: true
+          });
+        }else {
+          ElMessage({
+            message: response.data.msg,
+            type: 'error',
+            center: true
+          });
+        }
+      });
+    },
+
     // 阻止 el-input 回车的默认行为
     handleKeyDown(event) {
       if (event.keyCode === 13 && !event.shiftKey) {
@@ -88,9 +116,7 @@ export default {
 
       this_.generating = true;
 
-      const noteContent = store.getters.getLastSelectedNote.noteContent;
-
-      this_.gptMessage = noteContent.concat(this_.message).concat("\n");
+      this_.gptMessage = this_.message.concat("\n");
 
       await this_.onGetMessage();
     },
@@ -123,6 +149,8 @@ export default {
           if (event.data === "[DONE]") {
             sse.close();
             this_.generating = false;
+            // 自动保存
+            this_.autoSaveNote();
             return;
           }
           let answer = JSON.parse(event.data).content
@@ -167,7 +195,7 @@ export default {
   border: 1px solid #ccc;
   box-shadow: 2px 2px 10px #ccc;
   font-family: "Source Code Pro Light", sans-serif;
-  background: #E6F4F1;
+  background-color: #E6F4F1;
   position: fixed;
 }
 
