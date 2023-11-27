@@ -45,7 +45,8 @@ import ChatGPTSidebar from "@/components/ChatGPTSidebar";
 import {doPost} from "@/axios/httpRequest";
 import FloatNavbar from "@/components/FloatNavbar";
 import NavBar from "@/components/NavBar";
-import {EventSourcePolyfill} from "event-source-polyfill"
+import {EventSourcePolyfill} from "event-source-polyfill";
+import '@/assets/css/atom-one-dark.css';
 
 // 设置 marked 的选项及配置
 marked.setOptions({

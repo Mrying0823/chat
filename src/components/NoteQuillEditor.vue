@@ -1,12 +1,16 @@
 <template>
-  <QuillEditor
-      style="height: 74vh"
-      v-model:content="content"
-      ref="myQuillEditor"
-      :options="editorOption"
-      contentType="html"
+  <el-scrollbar
+      :class="{'night-mode-ql-toolbar': store.getters.getDarkMode}"
   >
-  </QuillEditor>
+    <QuillEditor
+        class="quill-container"
+        v-model:content="content"
+        ref="myQuillEditor"
+        :options="editorOption"
+        contentType="html"
+    >
+    </QuillEditor>
+  </el-scrollbar>
 </template>
 
 <script setup>
@@ -26,8 +30,7 @@ import {ElMessage} from "element-plus";
 import {doPost} from "@/axios/httpRequest";
 import Quill from 'quill';
 import Delta from 'quill-delta';
-// eslint-disable-next-line no-unused-vars
-import context from "@vueup/vue-quill/dist/vue-quill.esm-browser";
+import '@/assets/css/atom-one-dark.css';
 
 const Clipboard = Quill.import("modules/clipboard");
 
@@ -302,8 +305,6 @@ onMounted(() => {
     const noteContent = store.getters.getLastSelectedNote.noteContent;
     let gptMessage = marked.parse(props.gptMessage);
     toRaw(myQuillEditor.value).setHTML(noteContent.concat(gptMessage));
-    // context.emit("noteContent",toRaw(myQuillEditor.value).getQuill().root.innerHTML);
-    // defineEmits("noteContent",toRaw(myQuillEditor.value).getQuill().root.innerHTML);
     emits('msg',{noteContent: toRaw(myQuillEditor.value).getQuill().root.innerHTML});
   });
 
@@ -319,5 +320,25 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style>
+.quill-container {
+  position: relative;
+}
+
+.ql-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: #f0f0f0;
+}
+
+.night-mode-ql-toolbar .ql-toolbar {
+  background-color: #18392F;
+}
+
+.ql-container {
+  top: 5vh;
+}
 </style>

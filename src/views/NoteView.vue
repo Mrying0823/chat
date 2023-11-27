@@ -5,7 +5,7 @@
       <NoteSidebar/>
     </el-aside>
     <el-container>
-      <el-main>
+      <el-main style="overflow: hidden">
         <NoteQuillEditor class="note-body" :gptMessage="gptMessage" @msg="getNoteContent"/>
       </el-main>
       <el-footer class="chat-footer">
