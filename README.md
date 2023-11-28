@@ -17,4 +17,14 @@
 ![image](https://github.com/Mrying0823/chat/assets/111051660/af3155bd-0aa9-4ce6-a290-96c8bd364674)
 ![image](https://github.com/Mrying0823/chat/assets/111051660/9fab9554-9bea-4645-9934-fdf22e5898c6)
 
+2023/11/27 
+优化与 gpt 对话界面
+![image](https://github.com/Mrying0823/chat/assets/111051660/9df85f9f-ea85-4c68-9197-6a7fc134ed51)
+
+新增笔记功能（笔记专题、笔记）
+![image](https://github.com/Mrying0823/chat/assets/111051660/9a7d3cbe-03f7-458d-9486-b98a2c766260)
+
+夜间模式
+![image](https://github.com/Mrying0823/chat/assets/111051660/7b13bc59-212a-4948-8c82-1700473846f1)
+![image](https://github.com/Mrying0823/chat/assets/111051660/25656631-da3e-46d6-99e0-a3ebb75a46f3)
 
