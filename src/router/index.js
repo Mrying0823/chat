@@ -7,6 +7,7 @@ import HomePage from "@/views/HomePage";
 import LoginView from "@/views/LoginView";
 import store from "@/store";
 import NoteView from "@/views/NoteView";
+import WikiView from "@/views/WikiView";
 
 const routes = [
   {
@@ -49,6 +50,11 @@ const routes = [
     meta: {
       requireAuth: true
     }
+  },
+  {
+    path: "/wiki/wikiView",
+    name: "WikiView",
+    component: WikiView
   }
 ]
 
