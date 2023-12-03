@@ -8,6 +8,7 @@
         ref="myQuillEditor"
         :options="editorOption"
         contentType="html"
+        range="[1,10]"
     >
     </QuillEditor>
   </el-scrollbar>
