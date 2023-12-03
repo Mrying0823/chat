@@ -77,6 +77,7 @@ const store = createStore({
                         noteId: "",
                         noteContent: ""
                     });
+                    localStorage.clear();
                 }
             }, 10000);
         },
@@ -96,6 +97,7 @@ const store = createStore({
                 noteId: "",
                 noteContent: ""
             });
+            localStorage.clear();
         }
     },
     asyncDarkMode: (context, darkMode) => {
