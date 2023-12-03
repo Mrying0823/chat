@@ -1,5 +1,5 @@
 <template>
-  <div :class="this.$store.getters.getDarkMode ? 'night-mode-sidebar' : 'sidebar'">
+  <div :class="this.$store.getters.getDarkMode ? 'night-mode-note-sidebar' : 'note-sidebar'">
     <!-- 新键笔记专题按钮 -->
     <el-button :class="this.$store.getters.getDarkMode ? 'night-mode-category-create-btn': 'note-create-btn'" @click="createNoteCategory" size="large">
       <el-icon><Plus /></el-icon>
@@ -348,8 +348,22 @@ export default {
   }
 }
 </script>
-
+<!--#95F7B1-->
 <style scoped>
+.note-sidebar {
+  height: 100%;
+  box-sizing: border-box;
+  background: #00AAAD;
+  padding: 10px;
+}
+
+.night-mode-note-sidebar {
+  height: 100%;
+  box-sizing: border-box;
+  background: #18392F;
+  padding: 10px;
+}
+
 .note-create-btn {
   width: 13vw;
   color: white;
