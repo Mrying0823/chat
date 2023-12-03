@@ -545,7 +545,7 @@ color:#F08080;
 
 /* For group heading, of megamenu, coloring */
 .night-mode > ul > li > .megamenu h3 {
-    color:#333;
+    color:#fff;
 }
 
 /* For hover state of megamenu group item list */

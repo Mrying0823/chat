@@ -10,7 +10,7 @@
           <div class="title">
             <span class="text">{{ storePage.pageInfo.label }}</span>
           </div>
-          <div class="time">最近更新：{{ '2023/11/29' }}</div>
+          <div class="time">最近更新：{{ new Date() }}</div>
         </div>
       </div>
     </el-col>
@@ -149,7 +149,6 @@ const showConsole = () => {
 .left-action-box .collapse-box .fold-btn {
   font-size: 18px;
   padding: 4px 10px;
-  color: #888 !important;
 }
 
 .left-action-box .title-time-box {

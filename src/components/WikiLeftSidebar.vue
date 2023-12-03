@@ -179,7 +179,6 @@ pre {
   height: 40px;
   line-height: 30px;
   font-size: 25px;
-  color: #666;
   text-align: center;
   user-select: none;
 }

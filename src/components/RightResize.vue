@@ -46,7 +46,7 @@ const dragChangeRightAsideWidth = () => {
   width: 5px;
   height: 100%;
   cursor: w-resize;
-  background: #fafafa;
+  background: #f0f0f0;
   position: relative;
   top: -20px;
   user-select: none;
