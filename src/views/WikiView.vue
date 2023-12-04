@@ -22,6 +22,7 @@ import WikiLeftSidebar from "@/components/WikiLeftSidebar";
 import NavBar from "@/components/NavBar";
 import WikiRightHeader from "@/components/WikiRightHeader";
 import {useStoreDisplay} from "@/store/wikiDisplay";
+// eslint-disable-next-line no-unused-vars
 import {defineAsyncComponent, onMounted, ref, watchEffect} from "vue";
 import {useStorePageData} from "@/store/pageData";
 

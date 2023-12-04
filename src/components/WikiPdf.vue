@@ -1,6 +1,6 @@
 <template>
   <PDF
-      :src="storePage.pageInfo.pageSrc"
+      :src="pageData"
       ref="pdfViewer"
       progressColor="#f0f0f0"
       @wheel="handleWheel"
@@ -11,15 +11,24 @@
       :disableRange=true
       @on-page-change="handlePageChange"
       @on-pdf-init="handlePdfInit"
-  />
+      :pageTooltip="pageTooltip"
+  >
+<!--    <template v-slot:pageTooltip="">
+      <el-progress type="circle" :percentage="25" width="100"/>
+    </template>-->
+  </PDF>
 </template>
 
 <script setup>
 import PDF from "pdf-vue3";
 import {useStorePageData} from "@/store/pageData";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import * as pdfjs from 'pdfjs-dist/build/pdf';
+import {PDFDocument} from 'pdf-lib';
 
 let storePage = useStorePageData();
+
+const pageTooltip = ref([1,400])
 
 // ctrl + 滚轮实现缩放
 // eslint-disable-next-line no-unused-vars
@@ -74,16 +83,61 @@ const handlePageChange = (newPage) => {
   }
 };
 
-let pageNo = ref(1);
+let pageNo = ref();
+
+
 
 // 跳转至上一次阅读的页面
 const handlePdfInit = () => {
   const pageCategory = JSON.parse(localStorage.getItem("pageCategory"));
   if(pageCategory) {
-    const page = findPageById(pageInfo.id,pageCategory);
-    pageNo.value = page.page;
+    setTimeout(() => {
+      const page = findPageById(pageInfo.id,pageCategory);
+      pageNo.value = page.page;
+    },1000);
   }
 };
+
+// 分页加载
+let pageData = ref();
+
+function range(start, end) {
+  let length = end - start + 1;
+  return Array.from({ length }, (_, i) => start + i - 1);
+}
+
+async function extractPdfPage(arrayBuff) {
+  const pageCategory = JSON.parse(localStorage.getItem("pageCategory"));
+  const page = findPageById(pageInfo.id,pageCategory);
+
+  const pdfSrcDoc = await PDFDocument.load(arrayBuff);
+  const pdfNewDoc = await PDFDocument.create();
+  const pages = await pdfNewDoc.copyPages(pdfSrcDoc, range(1, page.page+10));
+  pages.forEach((page) => pdfNewDoc.addPage(page));
+  return await pdfNewDoc.save();
+}
+
+const loadPages = async () => {
+  try {
+    const pdfDocument = await pdfjs.getDocument(storePage.pageInfo.pageSrc).promise;
+
+    pdfDocument.getData().then((pdf) => {
+      console.log("pdfDocument",pdf);
+      extractPdfPage(pdf).then((newPdf) => {
+        pageData.value = newPdf;
+      })
+    })
+  } catch (error) {
+    console.error('Error loading pages:', error);
+  }
+};
+
+onMounted(() => {
+  // 初始化 PDF.js
+  pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.269/pdf.worker.mjs';
+
+  loadPages();
+});
 </script>
 
 <style>
