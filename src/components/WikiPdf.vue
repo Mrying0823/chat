@@ -4,6 +4,8 @@
       ref="pdfViewer"
       progressColor="#f0f0f0"
       @wheel="handleWheel"
+      :showPageTooltip="isShow"
+      :showBackToTopBtn="isShow"
       :page="pageNo"
       :pdfWidth="storePage.pageWidth+'%'"
       :disableStream=true
@@ -11,11 +13,26 @@
       :disableRange=true
       @on-page-change="handlePageChange"
       @on-pdf-init="handlePdfInit"
-      :pageTooltip="pageTooltip"
+      @on-scroll="handleOnScroll"
   >
-<!--    <template v-slot:pageTooltip="">
-      <el-progress type="circle" :percentage="25" width="100"/>
-    </template>-->
+    <template v-slot:pageTooltip>
+      <div style="width: 6%">
+        <el-progress
+            :text-inside="true"
+            :stroke-width="20"
+            :percentage="100"
+            color="#324B4B"
+            indeterminate
+            duration="5"
+        >
+          <span>{{ currentPage }} / {{ totalPages }}</span>
+        </el-progress>
+      </div>
+    </template>
+    <!-- eslint-disable vue/no-unused-vars -->
+    <template v-slot:backToTopBtn="{ scrollOffset }">
+      <el-backtop visibility-height="0" :bottom="30" :right="30" @click="backToTop"/>
+    </template>
   </PDF>
 </template>
 
@@ -27,8 +44,6 @@ import * as pdfjs from 'pdfjs-dist/build/pdf';
 import {PDFDocument} from 'pdf-lib';
 
 let storePage = useStorePageData();
-
-const pageTooltip = ref([1,400])
 
 // ctrl + 滚轮实现缩放
 // eslint-disable-next-line no-unused-vars
@@ -67,6 +82,11 @@ function findPageById(id, items) {
 
 let pageInfo = storePage.pageInfo;
 
+// 当前页码
+let currentPage = ref(1);
+
+let pageNo = ref();
+
 // 页面改变
 const handlePageChange = (newPage) => {
   // 在数组中找到对应 id 的对象
@@ -79,13 +99,11 @@ const handlePageChange = (newPage) => {
   // 如果找到了对应 id 的对象，则更新它的 page 字段
   if (pageToUpdate) {
     pageToUpdate.page = newPage;
+    pageNo.value = newPage;
+    currentPage.value = newPage;
     localStorage.setItem("pageCategory",JSON.stringify(storePage.pageCategory));
   }
 };
-
-let pageNo = ref();
-
-
 
 // 跳转至上一次阅读的页面
 const handlePdfInit = () => {
@@ -117,20 +135,50 @@ async function extractPdfPage(arrayBuff) {
   return await pdfNewDoc.save();
 }
 
+let totalPages = ref(1);
+
 const loadPages = async () => {
   try {
     const pdfDocument = await pdfjs.getDocument(storePage.pageInfo.pageSrc).promise;
 
+    // 获取总页码
+    totalPages.value = pdfDocument.numPages;
+
     pdfDocument.getData().then((pdf) => {
-      console.log("pdfDocument",pdf);
       extractPdfPage(pdf).then((newPdf) => {
         pageData.value = newPdf;
-      })
-    })
+      });
+    });
   } catch (error) {
     console.error('Error loading pages:', error);
   }
 };
+
+let isShow = ref(false);
+
+// 初始化计时器
+let timer;
+
+const handleOnScroll = () => {
+  // 设置 isShow 为 true
+  isShow.value = true;
+
+  // 重置定时器
+  clearTimeout(timer);
+
+  // 设置 isShow 为 true
+  isShow.value = true;
+
+  // 在3秒后将 isShow 设置为 false
+  timer = setTimeout(() => {
+    isShow.value = false;
+  }, 3000);
+}
+
+// 返回页码顶部
+const backToTop = () => {
+  pageNo.value = 1;
+}
 
 onMounted(() => {
   // 初始化 PDF.js
