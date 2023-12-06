@@ -1,0 +1,210 @@
+<template>
+  <div>
+    <div class="overlay"/>
+    <div class="loading-container">
+      <div class="loading">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+</script>
+
+<style scoped>
+.loading-container {
+  position: absolute;  /*绝对定位 */
+  width: 100%;
+  padding-left: 50%;
+  padding-top: 25%;
+  padding-right: 50%;
+  box-sizing: border-box;  /* 宽高和盒子一样 */
+}
+
+.overlay {
+  position: fixed;
+  top: 55px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #95B1B0;
+  opacity: 0.6;
+  z-index: 1000;
+}
+
+.loading,
+.loading > div {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.loading {
+  display: block;
+  font-size: 0;
+  color: #002B2E;
+  z-index: 9999;
+}
+
+.loading.la-dark {
+  color: #333;
+}
+
+.loading > div {
+  display: inline-block;
+  float: none;
+  background-color: currentColor;
+  border: 0 solid currentColor;
+}
+
+.loading {
+  width: 8px;
+  height: 8px;
+  float: left;
+}
+
+.loading > div {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  animation: ball-fussion-ball1 1s 0s ease infinite;
+}
+
+.loading > div:nth-child(1) {
+  top: 0;
+  left: 50%;
+  z-index: 1;
+}
+
+.loading > div:nth-child(2) {
+  top: 50%;
+  left: 100%;
+  z-index: 2;
+  animation-name: ball-fussion-ball2;
+}
+
+.loading > div:nth-child(3) {
+  top: 100%;
+  left: 50%;
+  z-index: 1;
+  animation-name: ball-fussion-ball3;
+}
+
+.loading > div:nth-child(4) {
+  top: 50%;
+  left: 0;
+  z-index: 2;
+  animation-name: ball-fussion-ball4;
+}
+
+.loading.la-sm {
+  width: 4px;
+  height: 4px;
+}
+
+.loading.la-sm > div {
+  width: 6px;
+  height: 6px;
+}
+
+.loading.la-2x {
+  width: 16px;
+  height: 16px;
+}
+
+.loading.la-2x > div {
+  width: 24px;
+  height: 24px;
+}
+
+.loading.la-3x {
+  width: 24px;
+  height: 24px;
+}
+
+.loading.la-3x > div {
+  width: 36px;
+  height: 36px;
+}
+
+@keyframes ball-fussion-ball2 {
+  0% {
+    opacity: 0.35;
+  }
+
+  50% {
+    top: 200%;
+    left: 200%;
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    left: 50%;
+    z-index: 1;
+    opacity: 0.35;
+  }
+}
+
+@keyframes ball-fussion-ball1 {
+  0% {
+    opacity: 0.35;
+  }
+
+  50% {
+    top: -100%;
+    left: 200%;
+    opacity: 1;
+  }
+
+  100% {
+    top: 50%;
+    left: 100%;
+    z-index: 2;
+    opacity: 0.35;
+  }
+}
+
+@keyframes ball-fussion-ball3 {
+  0% {
+    opacity: 0.35;
+  }
+
+  50% {
+    top: 200%;
+    left: -100%;
+    opacity: 1;
+  }
+
+  100% {
+    top: 50%;
+    left: 0;
+    z-index: 2;
+    opacity: 0.35;
+  }
+}
+
+@keyframes ball-fussion-ball4 {
+  0% {
+    opacity: 0.35;
+  }
+
+  50% {
+    top: -100%;
+    left: -100%;
+    opacity: 1;
+  }
+
+  100% {
+    top: 0;
+    left: 50%;
+    z-index: 1;
+    opacity: 0.35;
+  }
+}
+</style>
