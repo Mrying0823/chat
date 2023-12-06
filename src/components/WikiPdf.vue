@@ -39,11 +39,15 @@
 <script setup>
 import PDF from "pdf-vue3";
 import {useStorePageData} from "@/store/pageData";
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import * as pdfjs from 'pdfjs-dist/build/pdf';
 import {PDFDocument} from 'pdf-lib';
+import {useLoadingDisplay} from "@/store/loadingDisplay";
+import {ElMessage} from "element-plus";
 
 let storePage = useStorePageData();
+let storeDisplay = useLoadingDisplay();
+let loadingDisplay = useLoadingDisplay();
 
 // ctrl + 滚轮实现缩放
 // eslint-disable-next-line no-unused-vars
@@ -85,7 +89,9 @@ let pageInfo = storePage.pageInfo;
 // 当前页码
 let currentPage = ref(1);
 
-let pageNo = ref();
+let pageNo = ref(1);
+
+const emits = defineEmits(['msg']);
 
 // 页面改变
 const handlePageChange = (newPage) => {
@@ -98,21 +104,40 @@ const handlePageChange = (newPage) => {
 
   // 如果找到了对应 id 的对象，则更新它的 page 字段
   if (pageToUpdate) {
-    pageToUpdate.page = newPage;
-    pageNo.value = newPage;
-    currentPage.value = newPage;
-    localStorage.setItem("pageCategory",JSON.stringify(storePage.pageCategory));
+    if(pageBeginNo > 1) {
+      pageToUpdate.page = pageBeginNo+newPage-1;
+      //  pdf-vue3 从 1 开始计数
+      pageNo.value = newPage;
+      currentPage.value = pageBeginNo+newPage-1;
+      localStorage.setItem("pageCategory",JSON.stringify(storePage.pageCategory));
+    }else {
+      pageToUpdate.page = newPage;
+      pageNo.value = newPage;
+      currentPage.value = newPage;
+      localStorage.setItem("pageCategory",JSON.stringify(storePage.pageCategory));
+    }
+
+    if(loadedPages === newPage) {
+      storeDisplay.loadMoreOrHistory = true
+      console.log("storeDisplay.loadMoreOrHistory",storeDisplay.loadMoreOrHistory);
+      // emits('msg',{pdfKey: new Date().getTime()});
+    }
   }
 };
 
+// 已加载的总页码
+let loadedPages;
+
 // 跳转至上一次阅读的页面
-const handlePdfInit = () => {
-  const pageCategory = JSON.parse(localStorage.getItem("pageCategory"));
-  if(pageCategory) {
-    setTimeout(() => {
-      const page = findPageById(pageInfo.id,pageCategory);
-      pageNo.value = page.page;
-    },1000);
+const handlePdfInit = (pdf) => {
+  setTimeout(() => {
+    loadingDisplay.display = false;
+  },3000);
+
+  loadedPages = pdf.numPages;
+
+  if(!storeDisplay.loadMoreOrHistory) {
+    pageNo.value = loadedPages;
   }
 };
 
@@ -125,12 +150,9 @@ function range(start, end) {
 }
 
 async function extractPdfPage(arrayBuff) {
-  const pageCategory = JSON.parse(localStorage.getItem("pageCategory"));
-  const page = findPageById(pageInfo.id,pageCategory);
-
   const pdfSrcDoc = await PDFDocument.load(arrayBuff);
   const pdfNewDoc = await PDFDocument.create();
-  const pages = await pdfNewDoc.copyPages(pdfSrcDoc, range(1, page.page+10));
+  const pages = await pdfNewDoc.copyPages(pdfSrcDoc, range(pageBeginNo, pageBeginNo+10));
   pages.forEach((page) => pdfNewDoc.addPage(page));
   return await pdfNewDoc.save();
 }
@@ -151,6 +173,16 @@ const loadPages = async () => {
     });
   } catch (error) {
     console.error('Error loading pages:', error);
+
+    setTimeout(() => {
+      ElMessage({
+        message: '服务繁忙，请稍后重试',
+        type: 'warning',
+        center: true
+      });
+
+      loadingDisplay.display = false;
+    }, 3000);
   }
 };
 
@@ -159,7 +191,42 @@ let isShow = ref(false);
 // 初始化计时器
 let timer;
 
-const handleOnScroll = () => {
+async function extractHistoryPdfPage(arrayBuff) {
+  const pdfSrcDoc = await PDFDocument.load(arrayBuff);
+  const pdfNewDoc = await PDFDocument.create();
+  const pages = await pdfNewDoc.copyPages(pdfSrcDoc, range(pageBeginNo-10, pageBeginNo));
+  pages.forEach((page) => pdfNewDoc.addPage(page));
+  return await pdfNewDoc.save();
+}
+
+const loadHistoryPages = async () => {
+  try {
+    const pdfDocument = await pdfjs.getDocument(storePage.pageInfo.pageSrc).promise;
+
+    // 获取总页码
+    totalPages.value = pdfDocument.numPages;
+
+    pdfDocument.getData().then((pdf) => {
+      extractHistoryPdfPage(pdf).then((newPdf) => {
+        pageData.value = newPdf;
+      });
+    });
+  } catch (error) {
+    console.error('Error loading pages:', error);
+
+    setTimeout(() => {
+      ElMessage({
+        message: '服务繁忙，请稍后重试',
+        type: 'warning',
+        center: true
+      });
+
+      loadingDisplay.display = false;
+    }, 3000);
+  }
+};
+
+const handleOnScroll = (scrollOffset) => {
   // 设置 isShow 为 true
   isShow.value = true;
 
@@ -173,6 +240,12 @@ const handleOnScroll = () => {
   timer = setTimeout(() => {
     isShow.value = false;
   }, 3000);
+
+  // eslint-disable-next-line no-empty
+  if(scrollOffset === 0) {
+    storeDisplay.loadMoreOrHistory = false;
+    emits('msg',{pdfKey: new Date().getTime()});
+  }
 }
 
 // 返回页码顶部
@@ -180,11 +253,32 @@ const backToTop = () => {
   pageNo.value = 1;
 }
 
+// eslint-disable-next-line no-unused-vars
+let pageBeginNo;
+
 onMounted(() => {
   // 初始化 PDF.js
   pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.269/pdf.worker.mjs';
 
-  loadPages();
+  // 获取记录页码
+  const pageCategory = JSON.parse(localStorage.getItem("pageCategory"));
+  const page = findPageById(pageInfo.id,pageCategory);
+
+  pageBeginNo = page.page;
+  currentPage.value = pageBeginNo;
+
+  if(storeDisplay.loadMoreOrHistory) {
+    loadPages();
+  }else {
+    loadHistoryPages();
+  }
+});
+
+let pdfViewer = ref();
+
+// 在组件销毁时清理资源
+onUnmounted(() => {
+  // 在这里进行清理操作，释放资源
 });
 </script>
 
