@@ -58,7 +58,7 @@ onMounted(() => {
       reloadPdf();
     }
     console.log(storePage.pageInfo.pageSrc);
-  },{ deep: true });
+  });
 });
 </script>
 
