@@ -44,9 +44,11 @@ import * as pdfjs from 'pdfjs-dist/build/pdf';
 import {PDFDocument} from 'pdf-lib';
 import {useLoadingDisplay} from "@/store/loadingDisplay";
 import {ElMessage} from "element-plus";
+import {useStoreDisplay} from "@/store/wikiDisplay";
+import {debounce} from "lodash";
 
 let storePage = useStorePageData();
-let storeDisplay = useLoadingDisplay();
+let storeDisplay = useStoreDisplay();
 let loadingDisplay = useLoadingDisplay();
 
 // ctrl + 滚轮实现缩放
@@ -104,11 +106,16 @@ const handlePageChange = (newPage) => {
 
   // 如果找到了对应 id 的对象，则更新它的 page 字段
   if (pageToUpdate) {
-    if(pageBeginNo > 1) {
+    if(pageBeginNo > 1 && storeDisplay.loadMoreOrHistory) {
       pageToUpdate.page = pageBeginNo+newPage-1;
       //  pdf-vue3 从 1 开始计数
       pageNo.value = newPage;
       currentPage.value = pageBeginNo+newPage-1;
+      localStorage.setItem("pageCategory",JSON.stringify(storePage.pageCategory));
+    }else if(pageBeginNo >= loadedPages && !storeDisplay.loadMoreOrHistory) {
+      pageToUpdate.page = pageBeginNo+newPage-loadedPages;
+      pageNo.value = newPage;
+      currentPage.value = pageBeginNo+newPage-loadedPages;
       localStorage.setItem("pageCategory",JSON.stringify(storePage.pageCategory));
     }else {
       pageToUpdate.page = newPage;
@@ -117,10 +124,9 @@ const handlePageChange = (newPage) => {
       localStorage.setItem("pageCategory",JSON.stringify(storePage.pageCategory));
     }
 
-    if(loadedPages === newPage) {
+    if(loadedPages === newPage && pageBeginNo < totalPages.value) {
       storeDisplay.loadMoreOrHistory = true
-      console.log("storeDisplay.loadMoreOrHistory",storeDisplay.loadMoreOrHistory);
-      // emits('msg',{pdfKey: new Date().getTime()});
+      emits('msg',{pdfKey: new Date().getTime()});
     }
   }
 };
@@ -130,15 +136,15 @@ let loadedPages;
 
 // 跳转至上一次阅读的页面
 const handlePdfInit = (pdf) => {
-  setTimeout(() => {
-    loadingDisplay.display = false;
-  },3000);
-
   loadedPages = pdf.numPages;
 
-  if(!storeDisplay.loadMoreOrHistory) {
-    pageNo.value = loadedPages;
-  }
+  setTimeout(() => {
+    loadingDisplay.display = false;
+
+    if(!storeDisplay.loadMoreOrHistory) {
+      pageNo.value = loadedPages-1;
+    }
+  },3000);
 };
 
 // 分页加载
@@ -194,7 +200,12 @@ let timer;
 async function extractHistoryPdfPage(arrayBuff) {
   const pdfSrcDoc = await PDFDocument.load(arrayBuff);
   const pdfNewDoc = await PDFDocument.create();
-  const pages = await pdfNewDoc.copyPages(pdfSrcDoc, range(pageBeginNo-10, pageBeginNo));
+  let pages;
+  if(pageBeginNo <= loadedPages) {
+    pages = await pdfNewDoc.copyPages(pdfSrcDoc, range(1, pageBeginNo));
+  }else {
+    pages = await pdfNewDoc.copyPages(pdfSrcDoc, range(pageBeginNo-10, pageBeginNo));
+  }
   pages.forEach((page) => pdfNewDoc.addPage(page));
   return await pdfNewDoc.save();
 }
@@ -226,6 +237,9 @@ const loadHistoryPages = async () => {
   }
 };
 
+// eslint-disable-next-line no-unused-vars
+let currentScrollOffset;
+
 const handleOnScroll = (scrollOffset) => {
   // 设置 isShow 为 true
   isShow.value = true;
@@ -242,11 +256,28 @@ const handleOnScroll = (scrollOffset) => {
   }, 3000);
 
   // eslint-disable-next-line no-empty
-  if(scrollOffset === 0) {
+  if(scrollOffset === 0 && pageBeginNo >= loadedPages) {
     storeDisplay.loadMoreOrHistory = false;
     emits('msg',{pdfKey: new Date().getTime()});
   }
+  
+  currentScrollOffset = scrollOffset;
 }
+
+// 例如 lodash 中的 _.debounce 或 _.throttle
+const onScrollHandler = debounce(() => {
+  const scrollY = window.scrollY;
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+
+  if (scrollY + windowHeight >= documentHeight) {
+    // 到达页面底部，触发加载更多的逻辑
+    storeDisplay.loadMoreOrHistory = true
+    emits('msg',{pdfKey: new Date().getTime()});
+  }
+}, 200);
+
+window.addEventListener('scroll', onScrollHandler);
 
 // 返回页码顶部
 const backToTop = () => {
