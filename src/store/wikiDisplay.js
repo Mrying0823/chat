@@ -13,6 +13,8 @@ export const useStoreDisplay = defineStore('wikiDisplay', {
 			showHeader:true,
 			// 当前页面 view、space
 			currentPage: '',
+			// true 表示加载更多，false 表示查看历史页面
+			loadMoreOrHistory: true
 		}
 	},
 })
