@@ -32,3 +32,8 @@
 新增本地 pdf 文档展示，用于建立学习面向对象的系统体系
 ![image](https://github.com/Mrying0823/chat/assets/111051660/b75fc935-bee6-41f4-9aa9-9ff30d9ed6c0)
 ![image](https://github.com/Mrying0823/chat/assets/111051660/da2dae8f-a076-4999-826b-568e994b9292)
+
+2023/12/08
+本地 pdf 文档展示优化，实现分块加载，记录当前界面，加载更多界面、历史页面
+![image](https://github.com/Mrying0823/chat/assets/111051660/7e835961-233c-46d3-ae4d-b123b8a15871)
+
