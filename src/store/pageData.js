@@ -11,6 +11,7 @@ export const useStorePageData = defineStore('pageData', {
 			wikiPageList: [],
 			pageIsUnLock: false,
 			pageWidth: 80,
+			lastPagePath: "",
 			pageCategory: [
 				{
 					id: 1,

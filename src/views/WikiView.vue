@@ -11,8 +11,11 @@
       </el-header>
       <el-main style="user-select: none">
         <suspense>
-          <WikiPdf :key="pdfKey" v-if="isShow" @msg="loadMorePage"></WikiPdf>
+          <router-view :key="pdfKey" v-if="isShow" @msg="loadMorePage"/>
         </suspense>
+<!--        <suspense>
+          <WikiPdf :key="pdfKey" v-if="isShow" @msg="loadMorePage"></WikiPdf>
+        </suspense>-->
       </el-main>
     </el-container>
   </el-container>
@@ -33,6 +36,7 @@ let storeDisplay = useStoreDisplay();
 let storePage = useStorePageData();
 let loadingDisplay = useLoadingDisplay();
 
+// eslint-disable-next-line no-unused-vars
 const WikiPdf = defineAsyncComponent(() => import('@/components/WikiPdf'));
 
 let pdfKey = ref(new Date().getTime());
@@ -44,6 +48,7 @@ const reloadPdf = () => {
   isShow.value = true;
 };
 
+// eslint-disable-next-line no-unused-vars
 const loadMorePage = (msg) => {
   pdfKey.value = msg.pdfKey;
   loadingDisplay.display = true;
@@ -57,7 +62,6 @@ onMounted(() => {
       isShow.value = false;
       reloadPdf();
     }
-    console.log(storePage.pageInfo.pageSrc);
   });
 });
 </script>

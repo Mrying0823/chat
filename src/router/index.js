@@ -8,6 +8,9 @@ import LoginView from "@/views/LoginView";
 import store from "@/store";
 import NoteView from "@/views/NoteView";
 import WikiView from "@/views/WikiView";
+import QuestionListView from "@/views/QuestionListView";
+import WikiPdf from "@/components/WikiPdf"
+import {useStorePageData} from "@/store/pageData";
 
 const routes = [
   {
@@ -54,7 +57,22 @@ const routes = [
   {
     path: "/wiki/wikiView",
     name: "WikiView",
-    component: WikiView
+    component: WikiView,
+    children: [
+      {
+        path: "/wiki/wikiPdf",
+        name: "WikiPdf",
+        component: WikiPdf
+      }
+    ]
+  },
+  {
+    path: "/question/questionList",
+    name: "QuestionListView",
+    component: QuestionListView,
+    meta: {
+      requireAuth: true
+    }
   }
 ]
 
@@ -66,11 +84,17 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const phone = store.state.user.phone;
 
+  const storePage = useStorePageData();
+
   // 如果路由需要登录且用户未登录，重定向到登录页面
   if(to.matched.some(record => record.meta.requireAuth) && !phone) {
     next('/user/login');
   }else {
     next();
+  }
+
+  if(to.path === "/wiki/wikiPdf") {
+    storePage.lastPagePath = to.path;
   }
 });
 

@@ -102,10 +102,10 @@ const handleNodeClick = (data) => {
 
   // 重置页面大小
   storePage.pageWidth = 80;
-/*  router.push({
-    path: '/page/share/view',
-    query: {pageId: data.id, space: spaceUuid.value}
-  })*/
+  router.push({
+    path: '/wiki/wikiPdf',
+    query: {pageSrc: storePage.pageInfo.pageSrc}
+  })
 }
 
 let wikiPageTreeRef = ref();
