@@ -210,6 +210,7 @@ async function extractHistoryPdfPage(arrayBuff) {
   return await pdfNewDoc.save();
 }
 
+// eslint-disable-next-line no-unused-vars
 const loadHistoryPages = async () => {
   try {
     const pdfDocument = await pdfjs.getDocument(storePage.pageInfo.pageSrc).promise;
@@ -285,7 +286,7 @@ const backToTop = () => {
 }
 
 // eslint-disable-next-line no-unused-vars
-let pageBeginNo;
+let pageBeginNo = 1;
 
 onMounted(() => {
   // 初始化 PDF.js
@@ -293,10 +294,14 @@ onMounted(() => {
 
   // 获取记录页码
   const pageCategory = JSON.parse(localStorage.getItem("pageCategory"));
-  const page = findPageById(pageInfo.id,pageCategory);
 
-  pageBeginNo = page.page;
-  currentPage.value = pageBeginNo;
+  let page;
+
+  if(pageCategory) {
+    page = findPageById(pageInfo.id,pageCategory);
+    pageBeginNo = page.page;
+    currentPage.value = pageBeginNo;
+  }
 
   if(storeDisplay.loadMoreOrHistory) {
     loadPages();
