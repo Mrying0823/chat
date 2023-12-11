@@ -38,7 +38,8 @@ public class SpringSecurityConfiguration {
                         "/v2/api-docs",
                         "/v2/api-docs-ext").permitAll()
                 .mvcMatchers("/v1/user/phoneExists","/v1/user/register","/v1/user/login").permitAll()
-                .mvcMatchers("/v1/questionList/publicQuestionList").permitAll()
+                .mvcMatchers("/v1/questionList/forPublicQuestionList").permitAll()
+                .mvcMatchers("/v1/questionList/queryQuestionList").permitAll()
                 .anyRequest()
                 .authenticated();
 

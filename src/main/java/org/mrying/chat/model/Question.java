@@ -2,14 +2,17 @@ package org.mrying.chat.model;
 
 import java.util.Date;
 
+/**
+ * @author 邓和颖
+ */
 public class Question {
     private String id;
 
-    private String subjectId;
+    private String subject;
 
     private String question;
 
-    private String difficultyId;
+    private String difficulty;
 
     private String content;
 
@@ -29,12 +32,12 @@ public class Question {
         this.id = id;
     }
 
-    public String getSubjectId() {
-        return subjectId;
+    public String getSubject() {
+        return subject;
     }
 
-    public void setSubjectId(String subjectId) {
-        this.subjectId = subjectId;
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public String getQuestion() {
@@ -45,12 +48,12 @@ public class Question {
         this.question = question;
     }
 
-    public String getDifficultyId() {
-        return difficultyId;
+    public String getDifficulty() {
+        return difficulty;
     }
 
-    public void setDifficultyId(String difficultyId) {
-        this.difficultyId = difficultyId;
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
     }
 
     public String getContent() {

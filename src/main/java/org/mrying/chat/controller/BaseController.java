@@ -47,4 +47,8 @@ public class BaseController {
     // 数据字典服务
     @Resource
     protected DicValueService dicValueService;
+
+    // 问题列表服务
+    @Resource
+    protected QuestionService questionService;
 }

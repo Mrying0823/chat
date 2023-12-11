@@ -3,9 +3,9 @@
 <mapper namespace="org.mrying.chat.mapper.QuestionMapper" >
   <resultMap id="BaseResultMap" type="org.mrying.chat.model.Question" >
     <id column="id" property="id" jdbcType="CHAR" />
-    <result column="subject_id" property="subjectId" jdbcType="CHAR" />
+    <result column="subject" property="subject" jdbcType="CHAR" />
     <result column="question" property="question" jdbcType="VARCHAR" />
-    <result column="difficulty_id" property="difficultyId" jdbcType="CHAR" />
+    <result column="difficulty" property="difficulty" jdbcType="CHAR" />
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
     <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -13,130 +13,72 @@
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, subject_id, question, difficulty_id, content, created_at, updated_at, created_by, 
+    id, subject, question, difficulty, content, created_at, updated_at, created_by,
     updated_by
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
-    <include refid="Base_Column_List" />
-    from tbl_question
-    where id = #{id,jdbcType=CHAR}
+
+  <!-- 根据查询条件分页查询问题列表 -->
+  <select id="selectQuestionByConditionForPage" resultMap="BaseResultMap" parameterType="map" >
+    select
+    tq.id, tdv.value as subject, tq.question, tdv2.value as difficulty, bu.user_name as createdBy,
+    bu2.user_name as updatedBy, tq.created_at, tq.updated_at, tq.content
+
+    from tbl_question tq
+
+    join tbl_dic_value tdv on tdv.id = tq.subject
+    join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
+    join blog_user bu on bu.user_id = tq.created_by
+    left join blog_user bu2 on bu2.user_id = tq.updated_by
+
+    <where>
+      <if test="subject != null and subject != ''">
+        and tdv.value = #{subject,jdbcType=VARCHAR}
+      </if>
+
+      <if test="difficulty != null and difficulty != ''">
+        and tdv2.value = #{difficulty,jdbcType=VARCHAR}
+      </if>
+
+      <if test="keyword != null and keyword != ''">
+        and tq.question like '%' #{keyword,jdbcType=VARCHAR} '%'
+      </if>
+
+      <if test="userId != null and userId != ''">
+        and tq.created_by = #{userId,jdbcType=VARCHAR}
+      </if>
+    </where>
+
+    order by tq.created_at desc
+    limit #{beginNo},#{pageSize}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
-    delete from tbl_question
-    where id = #{id,jdbcType=CHAR}
-  </delete>
-  <insert id="insert" parameterType="org.mrying.chat.model.Question" >
-    insert into tbl_question (id, subject_id, question, 
-      difficulty_id, content, created_at, 
-      updated_at, created_by, updated_by
-      )
-    values (#{id,jdbcType=CHAR}, #{subjectId,jdbcType=CHAR}, #{question,jdbcType=VARCHAR}, 
-      #{difficultyId,jdbcType=CHAR}, #{content,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, 
-      #{updatedAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}
-      )
-  </insert>
-  <insert id="insertSelective" parameterType="org.mrying.chat.model.Question" >
-    insert into tbl_question
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
+
+  <!-- 根据查询条件获取问题数量 -->
+  <select id="selectCountOfQuestionByCondition" resultType="java.lang.Integer" parameterType="map">
+    select count(*)
+
+    from tbl_question tq
+
+    join tbl_dic_value tdv on tdv.id = tq.subject
+    join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
+    join blog_user bu on bu.user_id = tq.created_by
+    left join blog_user bu2 on bu2.user_id = tq.updated_by
+
+    <where>
+      <if test="subject != null and subject != ''">
+        and tdv.value = #{subject,jdbcType=VARCHAR}
       </if>
-      <if test="subjectId != null" >
-        subject_id,
+
+      <if test="difficulty != null and difficulty != ''">
+        and tdv2.value = #{difficulty,jdbcType=VARCHAR}
       </if>
-      <if test="question != null" >
-        question,
+
+      <if test="keyword != null and keyword != ''">
+        and tq.question like '%' #{keyword,jdbcType=VARCHAR} '%'
       </if>
-      <if test="difficultyId != null" >
-        difficulty_id,
+
+      <if test="userId != null and userId != ''">
+        and tq.created_by = #{userId,jdbcType=VARCHAR}
       </if>
-      <if test="content != null" >
-        content,
-      </if>
-      <if test="createdAt != null" >
-        created_at,
-      </if>
-      <if test="updatedAt != null" >
-        updated_at,
-      </if>
-      <if test="createdBy != null" >
-        created_by,
-      </if>
-      <if test="updatedBy != null" >
-        updated_by,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=CHAR},
-      </if>
-      <if test="subjectId != null" >
-        #{subjectId,jdbcType=CHAR},
-      </if>
-      <if test="question != null" >
-        #{question,jdbcType=VARCHAR},
-      </if>
-      <if test="difficultyId != null" >
-        #{difficultyId,jdbcType=CHAR},
-      </if>
-      <if test="content != null" >
-        #{content,jdbcType=VARCHAR},
-      </if>
-      <if test="createdAt != null" >
-        #{createdAt,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedAt != null" >
-        #{updatedAt,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdBy != null" >
-        #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        #{updatedBy,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="org.mrying.chat.model.Question" >
-    update tbl_question
-    <set >
-      <if test="subjectId != null" >
-        subject_id = #{subjectId,jdbcType=CHAR},
-      </if>
-      <if test="question != null" >
-        question = #{question,jdbcType=VARCHAR},
-      </if>
-      <if test="difficultyId != null" >
-        difficulty_id = #{difficultyId,jdbcType=CHAR},
-      </if>
-      <if test="content != null" >
-        content = #{content,jdbcType=VARCHAR},
-      </if>
-      <if test="createdAt != null" >
-        created_at = #{createdAt,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedAt != null" >
-        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdBy != null" >
-        created_by = #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        updated_by = #{updatedBy,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where id = #{id,jdbcType=CHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="org.mrying.chat.model.Question" >
-    update tbl_question
-    set subject_id = #{subjectId,jdbcType=CHAR},
-      question = #{question,jdbcType=VARCHAR},
-      difficulty_id = #{difficultyId,jdbcType=CHAR},
-      content = #{content,jdbcType=VARCHAR},
-      created_at = #{createdAt,jdbcType=TIMESTAMP},
-      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
-      created_by = #{createdBy,jdbcType=VARCHAR},
-      updated_by = #{updatedBy,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=CHAR}
-  </update>
+    </where>
+  </select>
 </mapper>

@@ -1,17 +1,20 @@
 package org.mrying.chat.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.mrying.chat.model.Question;
 
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author 邓和颖
+ */
+@Mapper
 public interface QuestionMapper {
-    int deleteByPrimaryKey(String id);
 
-    int insert(Question record);
+    // 根据查询条件分页查询问题列表
+    List<Question> selectQuestionByConditionForPage(Map<String,Object> map);
 
-    int insertSelective(Question record);
-
-    Question selectByPrimaryKey(String id);
-
-    int updateByPrimaryKeySelective(Question record);
-
-    int updateByPrimaryKey(Question record);
+    // 根据查询条件获取问题数量
+    int selectCountOfQuestionByCondition(Map<String,Object> map);
 }
