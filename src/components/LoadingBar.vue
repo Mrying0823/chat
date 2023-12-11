@@ -47,7 +47,7 @@
   display: block;
   font-size: 0;
   color: #002B2E;
-  z-index: 9999;
+  z-index: 1001;
 }
 
 .loading.la-dark {

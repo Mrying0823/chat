@@ -11,6 +11,7 @@ import WikiView from "@/views/WikiView";
 import QuestionListView from "@/views/QuestionListView";
 import WikiPdf from "@/components/WikiPdf"
 import {useStorePageData} from "@/store/pageData";
+import {useLoadingDisplay} from "@/store/loadingDisplay";
 
 const routes = [
   {
@@ -86,6 +87,8 @@ router.beforeEach((to, from, next) => {
 
   const storePage = useStorePageData();
 
+  const loadingDisplay = useLoadingDisplay();
+
   // 如果路由需要登录且用户未登录，重定向到登录页面
   if(to.matched.some(record => record.meta.requireAuth) && !phone) {
     next('/user/login');
@@ -95,6 +98,10 @@ router.beforeEach((to, from, next) => {
 
   if(to.path === "/wiki/wikiPdf") {
     storePage.lastPagePath = to.path;
+  }
+
+  if(loadingDisplay.display) {
+    loadingDisplay.display = false;
   }
 });
 
