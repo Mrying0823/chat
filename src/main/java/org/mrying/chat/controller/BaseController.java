@@ -43,4 +43,8 @@ public class BaseController {
     // 笔记服务
     @Resource
     protected NoteService noteService;
+
+    // 数据字典服务
+    @Resource
+    protected DicValueService dicValueService;
 }

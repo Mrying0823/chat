@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mrying.chat.mapper.DicValueMapper">
+  <resultMap id="BaseResultMap" type="org.mrying.chat.model.DicValue">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <id column="value" jdbcType="VARCHAR" property="value" />
+    <result column="order_no" jdbcType="INTEGER" property="orderNo" />
+    <result column="type_code" jdbcType="VARCHAR" property="typeCode" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, value, order_no, type_code, created_by
+  </sql>
+
+  <!-- 问题列表下拉列表根据 type_code 和 created_by 查询数据字典值 -->
+  <select id="selectDicValueByTypeCodeAndCreatedBy" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tbl_dic_value
+    where type_code = #{typeCode,jdbcType=VARCHAR} and created_by = #{createdBy,jdbcType=VARCHAR}
+    order by order_no asc
+  </select>
+</mapper>

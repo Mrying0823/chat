@@ -3,6 +3,7 @@ package org.mrying.chat.view;
 import org.mrying.chat.enums.RespCode;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 邓和颖
@@ -23,6 +24,9 @@ public class RespResult {
 
     // 集合数据
     private List list;
+
+    // 使用映射（Map）返回数据
+    private Map<String,Object> map;
 
     private String accessToken;
 
@@ -124,5 +128,13 @@ public class RespResult {
 
     public void setNoteId(String noteId) {
         this.noteId = noteId;
+    }
+
+    public Map<String, Object> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, Object> map) {
+        this.map = map;
     }
 }
