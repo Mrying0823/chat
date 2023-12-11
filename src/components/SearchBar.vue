@@ -7,12 +7,13 @@
           <el-select
               v-model="subject"
               placeholder="请选择专题"
+              clearable
           >
             <el-option
-                v-for="item in subjects"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                v-for="subject in subjectList"
+                :key="subject.id"
+                :label="subject.value"
+                :value="subject.value"
                 style="font-family: 'Source Code Pro Light',sans-serif"
             />
           </el-select>
@@ -21,17 +22,12 @@
       <el-col :span="4">
         <el-space direction="vertical" alignment="normal">
           <span>题目</span>
-          <el-autocomplete
-              v-model="question"
-              :fetch-suggestions="querySearch"
-              :trigger-on-focus="false"
-              clearable
-              debounce="500"
-              placeholder="请输入关键词"
-              @select="handleSelect"
-              style="width: 225px"
-          />
         </el-space>
+        <el-input
+            v-model="keyword"
+            placeholder="请输入关键词"
+            style="width: 225px"
+        />
       </el-col>
       <el-col :span="4">
         <el-space direction="vertical" alignment="normal">
@@ -39,12 +35,13 @@
           <el-select
               v-model="difficulty"
               placeholder="请选择难度"
+              clearable
           >
             <el-option
-                v-for="item in difficultyList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                v-for="difficulty in difficultyList"
+                :key="difficulty.id"
+                :label="difficulty.value"
+                :value="difficulty.value"
             />
           </el-select>
         </el-space>
@@ -63,83 +60,43 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import {toGet} from "@/axios/httpRequest";
+import {ElMessage} from "element-plus";
+import {useQuestionData} from "@/store/questionData";
 
-const difficulty = ref();
+const storeQuestion = useQuestionData();
 
-const difficultyList = [
-  {
-    value: '简单',
-    label: '简单',
-  },
-  {
-    value: '普通',
-    label: '普通',
-  },
-  {
-    value: '困难',
-    label: '困难',
-  },
-  {
-    value: '专家',
-    label: '专家',
-  }
-]
+const searchQuestion = () => {
+  storeQuestion.subject = subject.value;
+  storeQuestion.keyword = keyword.value;
+  storeQuestion.difficulty = difficulty.value;
+}
 
-const question = ref();
+const difficulty = ref("");
 
-const querySearch = (queryString, cb) => {
-  const results = queryString
-      ? loadAll().filter(createFilter(queryString))
-      : loadAll();
-  // call callback function to return suggestions
-  cb(results);
-};
+let difficultyList = ref([]);
 
-const createFilter = (queryString) => {
-  return (restaurant) => {
-    return restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-  };
-};
+const keyword = ref("");
 
-const loadAll = () => [
-  { value: 'vue', link: 'https://github.com/vuejs/vue' },
-  { value: 'element', link: 'https://github.com/ElemeFE/element' },
-  { value: 'cooking', link: 'https://github.com/ElemeFE/cooking' },
-  { value: 'mint-ui', link: 'https://github.com/ElemeFE/mint-ui' },
-  { value: 'vuex', link: 'https://github.com/vuejs/vuex' },
-  { value: 'vue-router', link: 'https://github.com/vuejs/vue-router' },
-  { value: 'babel', link: 'https://github.com/babel/babel' },
-];
+const subject = ref("");
 
-const handleSelect = (item) => {
-  console.log(item);
-};
+let subjectList = ref([]);
 
-const subject = ref();
-
-const subjects = [
-  {
-    value: 'JAVA 基础',
-    label: 'JAVA 基础',
-  },
-  {
-    value: 'JAVA 异常',
-    label: 'JAVA 异常',
-  },
-  {
-    value: 'JAVA 集合',
-    label: 'JAVA 集合',
-  },
-  {
-    value: 'JAVA 线程',
-    label: 'JAVA 线程',
-  },
-  {
-    value: 'JAVA 文件',
-    label: 'JAVA 文件',
-  },
-]
+onMounted(() => {
+  toGet("/questionList/forPublicQuestionList").then(response => {
+    if(response && response.data.code === 200) {
+      subjectList.value = response.data.map.subjectList;
+      difficultyList.value = response.data.map.difficultyList;
+    }else {
+      ElMessage({
+        type: "warning",
+        center: true,
+        message: response.data.msg
+      });
+    }
+  });
+});
 </script>
 
 <style scoped>
