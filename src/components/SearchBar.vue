@@ -48,6 +48,7 @@
       </el-col>
       <el-col :span="4" style="padding-top: 29px">
         <el-button
+            ref="resetBtn"
             size="default"
             type="plain"
             @click="searchQuestion"
@@ -67,7 +68,12 @@ import {useQuestionData} from "@/store/questionData";
 
 const storeQuestion = useQuestionData();
 
+const resetBtn = ref();
+
 const searchQuestion = () => {
+  // 通过 ref 使按钮失焦
+  resetBtn.value.ref.blur()
+
   storeQuestion.subject = subject.value;
   storeQuestion.keyword = keyword.value;
   storeQuestion.difficulty = difficulty.value;
@@ -100,5 +106,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 </style>

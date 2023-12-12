@@ -8,7 +8,13 @@ export const useQuestionData = defineStore('questionData', {
             // 关键词
             keyword: "",
             // 难度
-            difficulty: ""
+            difficulty: "",
+            // 查看详细
+            detailDialog: false,
+            // 查看问题
+            question: "",
+            // 内容
+            content: ""
         }
     },
 })

@@ -6,6 +6,7 @@
       <SearchBar/>
     </el-header>
     <el-main>
+      <QuestionDetails/>
       <QuestionList/>
     </el-main>
   </el-container>
@@ -17,6 +18,7 @@ import QuestionList from "@/components/QuestionList";
 import SearchBar from "@/components/SearchBar";
 import LoadingBar from "@/components/LoadingBar"
 import {useLoadingDisplay} from "@/store/loadingDisplay";
+import QuestionDetails from "@/components/QuestionDetails";
 
 const loadingDisplay = useLoadingDisplay();
 

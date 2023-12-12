@@ -7,7 +7,7 @@
         class="list"
         height="540"
     >
-      <el-table-column prop="subject" label="专题" width="160" show-overflow-tooltip align="center">
+      <el-table-column prop="subject" label="专题" width="160" align="center" :resizable="false">
         <template #default="scope">
           <el-tag
               size="small"
@@ -17,13 +17,24 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="question" label="题目" show-overflow-tooltip width="300" align="center"/>
-      <el-table-column prop="content" label="内容" show-overflow-tooltip align="center"/>
+      <el-table-column prop="question" label="题目" show-overflow-tooltip width="300" align="center" :resizable="false"/>
+      <el-table-column
+          prop="content"
+          label="内容" align="center"
+          :resizable="false"
+      >
+        <template #default="scope">
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            {{ scope.row.content }}
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column
           prop="difficulty"
           label="难度"
           align="center"
           width="100"
+          :resizable="false"
       >
         <template #default="scope">
           <el-tag
@@ -35,12 +46,14 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="详细" width="100" align="center">
+      <el-table-column label="详细" width="100" align="center" :resizable="false">
         <template #default="scope">
+          <!-- scope.$index： 表示当前行的索引，即在整个表格中的行号，从 0 开始计数。-->
+          <!-- scope.row： 表示当前行的数据对象，即当前行的数据。-->
           <el-button
               size="small"
               type="plain"
-              @click="handleEdit(scope.$index, scope.row)"
+              @click="handleDetail(scope.row,$event)"
           >
             查看
           </el-button>
@@ -100,6 +113,19 @@ function doPageChangePost() {
       });
     }
   });
+}
+
+const handleDetail = (question,event) => {
+  // 按钮失焦
+  event.target.blur();
+  if(event.target.nodeName === "SPAN") {
+    event.target.parentNode.blur();
+  }
+
+  storeQuestion.detailDialog = true;
+
+  storeQuestion.question = question.question;
+  storeQuestion.content = question.content;
 }
 
 const handleSizeChange = () => {
