@@ -24,6 +24,10 @@ public class Question {
 
     private String updatedBy;
 
+    private String createdDate;
+
+    private String updatedDate;
+
     public String getId() {
         return id;
     }
@@ -94,5 +98,21 @@ public class Question {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(String updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }

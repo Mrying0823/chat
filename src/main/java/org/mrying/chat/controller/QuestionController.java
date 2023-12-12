@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.mrying.chat.model.DicValue;
 import org.mrying.chat.model.Question;
+import org.mrying.chat.utils.DateConvertUtils;
 import org.mrying.chat.view.RespResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,6 +80,14 @@ public class QuestionController extends BaseController {
             respResult = RespResult.ok();
 
             Map<String,Object> retMap = new HashMap<>();
+
+            for(Question question : questionList) {
+                question.setCreatedDate(DateConvertUtils.getDateTimeString(question.getCreatedAt()));
+                if(question.getUpdatedAt() != null) {
+                    question.setUpdatedDate(DateConvertUtils.getDateTimeString(question.getUpdatedAt()));
+                }
+            }
+
             retMap.put("questionList",questionList);
             retMap.put("totalRows",totalRows);
 
