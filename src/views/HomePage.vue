@@ -16,13 +16,13 @@
                     </div>
                     <div class="el-col-8 card-intro">
                       <div class="card-title">
-                        文章
-                        <router-link to="/articles">
+                        文档
+                        <router-link to="/wiki/wikiView">
                           <el-button color="#5194da" style="margin: 5px 0 10px 0;" round plain>Explore</el-button>
                         </router-link>
                       </div>
                       <div class="card-text">
-                        分类查看文章，发表知识总结，分享您的思考
+                        系统学习面向对象程序设计
                       </div>
 
                     </div>
@@ -43,7 +43,7 @@
                         </router-link>
                       </div>
                       <div class="card-text">
-                        提供 ChatGPT 接口，通过 Token 或 OpenAI Api-Key 访问，学习与工作的好帮手
+                        对话 ChatGPT 辅助学习
                       </div>
                     </div>
                   </div>
@@ -57,13 +57,33 @@
                     </div>
                     <div class="el-col-8 card-intro">
                       <div class="card-title">
-                        刷题
-                        <router-link to="/problems">
+                        问题
+                        <router-link to="/question/questionList">
                           <el-button color="#5194da" style="margin: 5px 0 10px 0;" round plain>Explore</el-button>
                         </router-link>
                       </div>
                       <div class="card-text">
-                        速通高频面试题，记录回答音频，ChatGPT 辅助解答，完善您的答案
+                        寻找问题的答案
+                      </div>
+                    </div>
+                  </div>
+                </el-card>
+              </el-carousel-item>
+              <el-carousel-item>
+                <el-card shadow="hover" body-style="" class="card">
+                  <div class="el-row">
+                    <div class="el-col-16">
+                      <img class="card-image"  src="../assets/img/阅读.png" alt="hi">
+                    </div>
+                    <div class="el-col-8 card-intro">
+                      <div class="card-title">
+                        笔记
+                        <router-link to="/note/userNote">
+                          <el-button color="#5194da" style="margin: 5px 0 10px 0;" round plain>Explore</el-button>
+                        </router-link>
+                      </div>
+                      <div class="card-text">
+                        记录学习进度
                       </div>
                     </div>
                   </div>
@@ -99,4 +119,17 @@ export default {
 </script>
 
 <style scoped>
+h1 {
+  color: rgba(246, 247, 248, 0.82);
+  font-size: 60px;
+  margin: 0;
+  user-select: none;
+}
+
+h3 {
+  color: rgba(246, 247, 248, 0.82);
+  font-size: 28px;
+  margin: 0;
+  user-select: none;
+}
 </style>

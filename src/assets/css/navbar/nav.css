@@ -9,7 +9,7 @@ body { background-color:#fff; } /* For body color */
     padding:0;
     width:100%;
     margin:0 auto;
-    z-index: 9999;
+    z-index: 1002;
 }
 
 /* For nav back, which has been only framed. Color style is present in other navbar files */
