@@ -37,3 +37,6 @@
 本地 pdf 文档展示优化，实现分块加载，记录当前界面，加载更多界面、历史页面
 ![image](https://github.com/Mrying0823/chat/assets/111051660/7e835961-233c-46d3-ae4d-b123b8a15871)
 
+2023/12/11
+完成问题列表初始化、分页、根据条件查询问题功能。
+![image](https://github.com/Mrying0823/chat/assets/111051660/39dcd10e-eb78-44ec-99de-0b8c13c70f00)
