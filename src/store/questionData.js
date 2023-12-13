@@ -3,6 +3,10 @@ import {defineStore} from 'pinia'
 export const useQuestionData = defineStore('questionData', {
     state: () => {
         return {
+            // 当前页码
+            pageNo: 1,
+            // 当前页面大小
+            pageSize: 10,
             // 专题
             subject: "",
             // 关键词

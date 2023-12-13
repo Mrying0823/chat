@@ -1,7 +1,7 @@
 <template>
   <div style="padding-top: 8px;user-select: none">
     <el-row>
-      <el-col :span="4">
+      <el-col :span="4" v-if="subjectSearch">
         <el-space direction="vertical" alignment="normal">
           <span>专题</span>
           <el-select
@@ -10,7 +10,7 @@
               clearable
           >
             <el-option
-                v-for="subject in subjectList"
+                v-for="subject in storeQuestion.subjectList"
                 :key="subject.id"
                 :label="subject.value"
                 :value="subject.value"
@@ -19,7 +19,7 @@
           </el-select>
         </el-space>
       </el-col>
-      <el-col :span="4">
+      <el-col :span="4" v-if="keywordSearch">
         <el-space direction="vertical" alignment="normal">
           <span>题目</span>
         </el-space>
@@ -29,7 +29,7 @@
             style="width: 225px"
         />
       </el-col>
-      <el-col :span="4">
+      <el-col :span="4" v-if="difficultySearch">
         <el-space direction="vertical" alignment="normal">
           <span>难度</span>
           <el-select
@@ -38,7 +38,41 @@
               clearable
           >
             <el-option
-                v-for="difficulty in difficultyList"
+                v-for="difficulty in storeQuestion.difficultyList"
+                :key="difficulty.id"
+                :label="difficulty.value"
+                :value="difficulty.value"
+            />
+          </el-select>
+        </el-space>
+      </el-col>
+      <el-col :span="4" v-if="difficultySearch">
+        <el-space direction="vertical" alignment="normal">
+          <span>创建日期</span>
+          <el-select
+              v-model="difficulty"
+              placeholder="请选择日期"
+              clearable
+          >
+            <el-option
+                v-for="difficulty in storeQuestion.difficultyList"
+                :key="difficulty.id"
+                :label="difficulty.value"
+                :value="difficulty.value"
+            />
+          </el-select>
+        </el-space>
+      </el-col>
+      <el-col :span="4" v-if="difficultySearch">
+        <el-space direction="vertical" alignment="normal">
+          <span>修改日期</span>
+          <el-select
+              v-model="difficulty"
+              placeholder="请选择日期"
+              clearable
+          >
+            <el-option
+                v-for="difficulty in storeQuestion.difficultyList"
                 :key="difficulty.id"
                 :label="difficulty.value"
                 :value="difficulty.value"
@@ -61,10 +95,11 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
-import {toGet} from "@/axios/httpRequest";
-import {ElMessage} from "element-plus";
+import {ref} from "vue";
 import {useQuestionData} from "@/store/questionData";
+
+// eslint-disable-next-line no-unused-vars
+const props = defineProps(['subjectSearch', 'keywordSearch', 'difficultySearch']);
 
 const storeQuestion = useQuestionData();
 
@@ -81,28 +116,9 @@ const searchQuestion = () => {
 
 const difficulty = ref("");
 
-let difficultyList = ref([]);
-
 const keyword = ref("");
 
 const subject = ref("");
-
-let subjectList = ref([]);
-
-onMounted(() => {
-  toGet("/questionList/forPublicQuestionList").then(response => {
-    if(response && response.data.code === 200) {
-      subjectList.value = response.data.map.subjectList;
-      difficultyList.value = response.data.map.difficultyList;
-    }else {
-      ElMessage({
-        type: "warning",
-        center: true,
-        message: response.data.msg
-      });
-    }
-  });
-});
 </script>
 
 <style scoped>

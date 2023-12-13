@@ -80,40 +80,20 @@
 
 <script setup>
 // ElConfigProvider 组件
-import {ElConfigProvider, ElMessage} from 'element-plus'
+import {ElConfigProvider} from 'element-plus'
 // 引入中文包
 import zhCn from "element-plus/es/locale/lang/zh-cn";
-import {onMounted, ref, watchEffect} from "vue";
-import {doPost} from "@/axios/httpRequest";
-import {useLoadingDisplay} from "@/store/loadingDisplay";
 import {useQuestionData} from "@/store/questionData";
-
-const loadingDisplay = useLoadingDisplay();
+import {ref} from "vue";
 
 const storeQuestion = useQuestionData();
 
-function doPageChangePost() {
-  doPost("/questionList/queryQuestionList",{pageNo: pageNo.value,
-                                                      pageSize: pageSize.value,
-                                                      subject: storeQuestion.subject,
-                                                      keyword: storeQuestion.keyword,
-                                                      difficulty: storeQuestion.difficulty
-  }).then(response => {
-    if(response && response.data.code === 200) {
-      tableData.value = response.data.map.questionList;
-      totalRows.value = response.data.map.totalRows;
-      setTimeout(() => {
-        loadingDisplay.display = false;
-      },1000);
-    }else {
-      ElMessage({
-        type: "warning",
-        center: true,
-        message: response.data.msg
-      });
-    }
-  });
-}
+// eslint-disable-next-line no-unused-vars
+const props = defineProps(['totalRows', "tableData"]);
+
+const pageNo = ref(storeQuestion.pageNo);
+
+const pageSize = ref(storeQuestion.pageSize);
 
 const handleDetail = (question,event) => {
   // 按钮失焦
@@ -129,11 +109,11 @@ const handleDetail = (question,event) => {
 }
 
 const handleSizeChange = () => {
-  doPageChangePost();
+  storeQuestion.pageSize = pageSize.value;
 }
 
 const handleCurrentChange = () => {
-  doPageChangePost();
+  storeQuestion.pageNo = pageNo.value;
 }
 
 const difficultyType = (difficulty) => {
@@ -150,26 +130,6 @@ const difficultyType = (difficulty) => {
         return '';
     }
 };
-
-let tableData = ref([]);
-
-let totalRows = ref(0);
-
-let pageNo = ref(1);
-
-let pageSize = ref(10);
-
-onMounted(() => {
-  loadingDisplay.display = true;
-
-  doPageChangePost();
-
-  watchEffect(() => {
-    if(storeQuestion) {
-      doPageChangePost();
-    }
-  });
-})
 </script>
 
 <style scoped>
