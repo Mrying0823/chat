@@ -10,6 +10,8 @@ import NoteView from "@/views/NoteView";
 import WikiView from "@/views/WikiView";
 import QuestionListView from "@/views/QuestionListView";
 import WikiPdf from "@/components/WikiPdf"
+import MyQuestionListView from "@/views/MyQuestionListView"
+import EditQuestionView from "@/views/EditQuestionView"
 import {useStorePageData} from "@/store/pageData";
 import {useLoadingDisplay} from "@/store/loadingDisplay";
 
@@ -70,7 +72,20 @@ const routes = [
   {
     path: "/question/questionList",
     name: "QuestionListView",
-    component: QuestionListView,
+    component: QuestionListView
+  },
+  {
+    path: "/question/myQuestionList",
+    name: "myQuestionList",
+    component: MyQuestionListView,
+    meta: {
+      requireAuth: true
+    }
+  },
+  {
+    path: "/question/editQuestion",
+    name: "EditQuestionView",
+    component: EditQuestionView,
     meta: {
       requireAuth: true
     }
@@ -87,6 +102,7 @@ router.beforeEach((to, from, next) => {
 
   const storePage = useStorePageData();
 
+  // eslint-disable-next-line no-unused-vars
   const loadingDisplay = useLoadingDisplay();
 
   // 如果路由需要登录且用户未登录，重定向到登录页面
@@ -100,7 +116,7 @@ router.beforeEach((to, from, next) => {
     storePage.lastPagePath = to.path;
   }
 
-  if(loadingDisplay.display) {
+  if(to.path !== "/wiki/wikiPdf") {
     loadingDisplay.display = false;
   }
 });

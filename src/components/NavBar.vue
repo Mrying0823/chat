@@ -24,6 +24,7 @@
                 style="--el-switch-on-color: #002B2E;"
             />
           </a></li>
+          <li><router-link :to="{path: '/question/myQuestionList'}">我的问题</router-link></li>
           <li @click="logout"><a style="cursor: pointer">注销</a></li>
         </ul>
       </li>

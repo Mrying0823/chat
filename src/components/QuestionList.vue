@@ -59,6 +59,19 @@
           </el-button>
         </template>
       </el-table-column>
+      <el-table-column label="操作" width="100" align="center" :resizable="false">
+        <template #default="scope">
+          <!-- scope.$index： 表示当前行的索引，即在整个表格中的行号，从 0 开始计数。-->
+          <!-- scope.row： 表示当前行的数据对象，即当前行的数据。-->
+          <el-button
+              size="small"
+              type="plain"
+              @click="handleEdit(scope.row,$event)"
+          >
+            编辑
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <ElConfigProvider :locale="zhCn">

@@ -18,7 +18,11 @@ export const useQuestionData = defineStore('questionData', {
             // 查看问题
             question: "",
             // 内容
-            content: ""
+            content: "",
+            // 创建日期
+            createdDate: "",
+            // 修改日期
+            updatedDate: ""
         }
     },
 })

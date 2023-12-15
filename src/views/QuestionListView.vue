@@ -7,6 +7,7 @@
           :subject-search="true"
           :keyword-search="true"
           :difficulty-search="true"
+          :admin="true"
       />
     </el-header>
     <el-main>
