@@ -28,6 +28,8 @@ public class Question {
 
     private String updatedDate;
 
+    private String stage;
+
     public String getId() {
         return id;
     }
@@ -114,5 +116,13 @@ public class Question {
 
     public void setUpdatedDate(String updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 }
