@@ -4,24 +4,102 @@
       <el-input v-if="true" v-model="question" :maxlength="40" placeholder="请输入标题" class="page-title-input" ></el-input>
     </el-col>
     <el-col style="flex: 0 0 180px;text-align: right;">
-      <el-button ref="resetBtn" type="primary" @click="createWikiSave">保存</el-button>
+      <el-button ref="resetBtn" type="primary" @click="confirm = true">保存</el-button>
       <el-button ref="resetBtn" @click="createQuestionCancel" style="margin-right: 5px">取消</el-button>
     </el-col>
   </el-row>
+  <el-dialog
+      v-model="confirm"
+      title="附加信息"
+      :destroy-on-close="true"
+      align-center
+      width="15%"
+      center
+  >
+    <el-row>
+      <el-col :span="24">
+        <el-space direction="vertical" alignment="normal">
+          <span>阶段</span>
+          <el-select
+              v-model="stage"
+              placeholder="请选择阶段"
+              clearable
+          >
+            <el-option
+                v-for="stage in storeQuestion.stageList"
+                :key="stage.id"
+                :label="stage.value"
+                :value="stage.value"
+            />
+          </el-select>
+        </el-space>
+      </el-col>
+      <el-col :span="24">
+        <el-space direction="vertical" alignment="normal">
+          <span>专题</span>
+          <el-select
+              v-model="subject"
+              placeholder="请选择专题"
+              clearable
+          >
+            <el-option
+                v-for="subject in storeQuestion.subjectList"
+                :key="subject.id"
+                :label="subject.value"
+                :value="subject.value"
+            />
+          </el-select>
+        </el-space>
+      </el-col>
+      <el-col :span="24">
+        <el-space direction="vertical" alignment="normal">
+          <span>难度</span>
+          <el-select
+              v-model="difficulty"
+              placeholder="请选择难度"
+              clearable
+          >
+            <el-option
+                v-for="difficulty in storeQuestion.difficultyList"
+                :key="difficulty.id"
+                :label="difficulty.value"
+                :value="difficulty.value"
+            />
+          </el-select>
+        </el-space>
+      </el-col>
+    </el-row>
+    <template #footer>
+        <el-button @click="confirm = false">
+          继续编辑
+        </el-button>
+        <el-button type="primary" @click="createQuestionSave">
+          确定
+        </el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import { useRouter } from "vue-router";
 import {ref} from "vue";
 import {ElMessageBox} from "element-plus";
+import {useQuestionData} from "@/store/questionData";
+
+const storeQuestion = useQuestionData();
 
 const router = useRouter();
 
 const resetBtn = ref();
 
 const question = ref(router.currentRoute.value.query.question);
+const stage = ref();
+const subject = ref();
+const difficulty = ref();
 
-const createWikiSave = () => {
+let confirm = ref(false);
+
+const createQuestionSave = () => {
   resetBtn.value.ref.blur();
 }
 

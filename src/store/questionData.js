@@ -22,7 +22,15 @@ export const useQuestionData = defineStore('questionData', {
             // 创建日期
             createdDate: "",
             // 修改日期
-            updatedDate: ""
+            updatedDate: "",
+            // 确认窗口
+            confirmDialog: true,
+            // 专题列表
+            subjectList: [],
+            // 难度列表
+            difficultyList: [],
+            // 阶段列表
+            stageList: []
         }
     },
 })
