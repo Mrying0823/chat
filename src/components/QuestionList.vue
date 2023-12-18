@@ -59,7 +59,7 @@
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100" align="center" :resizable="false">
+      <el-table-column label="操作" width="100" align="center" :resizable="false" v-if="edit">
         <template #default="scope">
           <!-- scope.$index： 表示当前行的索引，即在整个表格中的行号，从 0 开始计数。-->
           <!-- scope.row： 表示当前行的数据对象，即当前行的数据。-->
@@ -102,7 +102,7 @@ import {ref} from "vue";
 const storeQuestion = useQuestionData();
 
 // eslint-disable-next-line no-unused-vars
-const props = defineProps(['totalRows', "tableData"]);
+const props = defineProps(['totalRows', "tableData", "edit"]);
 
 const pageNo = ref(storeQuestion.pageNo);
 

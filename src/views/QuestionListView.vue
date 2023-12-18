@@ -15,6 +15,7 @@
       <QuestionList
           :table-data="tableData"
           :total-rows="totalRows"
+          :edit="false"
       />
     </el-main>
   </el-container>
@@ -67,6 +68,7 @@ function doInitPost() {
     if(response && response.data.code === 200) {
       storeQuestion.subjectList = response.data.map.subjectList;
       storeQuestion.difficultyList = response.data.map.difficultyList;
+      storeQuestion.stageList = response.data.map.stageList;
     }else {
       ElMessage({
         type: "warning",

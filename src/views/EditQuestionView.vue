@@ -5,7 +5,7 @@
     </el-header>
     <QuestionEditor
       :night-mode="this.$store.getters.getDarkMode ? '#18392F': '#fff'"
-    ></QuestionEditor>
+    />
   </el-container>
 </template>
 

@@ -7,7 +7,7 @@
             v-model="markdownContent"
             :toolbars="toolbars"
             :externalLink="false"
-            style="height: calc(100vh - 100px);z-index: 1;"
+            style="height: calc(100vh - 100px);"
             :style="this.$store.getters.getDarkMode ? 'background-color: #18392F;color: #f0f0f0': ''"
             @save="createWikiSave(0)"
             @imgAdd="addMarkdownImage"

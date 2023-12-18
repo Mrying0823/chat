@@ -55,6 +55,8 @@
                 type="date"
                 placeholder="请选择日期"
                 size="default"
+                format="YYYY/MM/DD"
+                value-format="YYYY-MM-DD"
             />
           </ElConfigProvider>
         </el-space>
@@ -68,6 +70,8 @@
                 type="date"
                 placeholder="请选择日期"
                 size="default"
+                format="YYYY/MM/DD"
+                value-format="YYYY-MM-DD"
             />
           </ElConfigProvider>
         </el-space>
