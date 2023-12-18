@@ -2,8 +2,10 @@ package org.mrying.chat.utils;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -32,7 +34,7 @@ public class DateConvertUtils {
      */
     public static String getDateTimeString(Date date) {
         // 格式化日期
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
 
@@ -43,7 +45,21 @@ public class DateConvertUtils {
         Instant instant = Instant.ofEpochMilli(timestamp);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
         // 格式化日期
-        return localDateTime.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return localDateTime.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    /**
+    * 将指定格式字符串转化为时间戳
+    */
+    public static long getTimestampFromFormattedDate(String formattedDate) {
+        // 解析格式化的日期字符串
+        LocalDate localDate = LocalDate.parse(formattedDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        // 转换为 Instant
+        Instant instant = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+
+        // 获取时间戳
+        return instant.toEpochMilli();
     }
 }
 
