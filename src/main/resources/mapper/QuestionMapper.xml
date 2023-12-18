@@ -16,7 +16,6 @@
     id, subject, question, difficulty, content, created_at, updated_at, created_by,
     updated_by
   </sql>
-
   <!-- 根据查询条件分页查询问题列表 -->
   <select id="selectQuestionByConditionForPage" resultMap="BaseResultMap" parameterType="map" >
     select
@@ -25,10 +24,10 @@
 
     from tbl_question tq
 
-    join tbl_dic_value tdv on tdv.id = tq.subject
-    join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
+    left join tbl_dic_value tdv on tdv.id = tq.subject
+    left join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
     join blog_user bu on bu.user_id = tq.created_by
-    left join blog_user bu2 on bu2.user_id = tq.updated_by
+    join blog_user bu2 on bu2.user_id = tq.updated_by
 
     <where>
       <if test="subject != null and subject != ''">
@@ -41,6 +40,14 @@
 
       <if test="keyword != null and keyword != ''">
         and tq.question like '%' #{keyword,jdbcType=VARCHAR} '%'
+      </if>
+
+      <if test="createdAt != null and createdAt != ''">
+        and cast(tq.created_at as date) = #{createdAt,jdbcType=VARCHAR}
+      </if>
+
+      <if test="updatedAt != null and updatedAt != ''">
+        and cast(tq.updated_at as date) = #{updatedAt,jdbcType=VARCHAR}
       </if>
 
       <if test="userId != null and userId != ''">
@@ -58,10 +65,10 @@
 
     from tbl_question tq
 
-    join tbl_dic_value tdv on tdv.id = tq.subject
-    join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
+    left join tbl_dic_value tdv on tdv.id = tq.subject
+    left join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
     join blog_user bu on bu.user_id = tq.created_by
-    left join blog_user bu2 on bu2.user_id = tq.updated_by
+    join blog_user bu2 on bu2.user_id = tq.updated_by
 
     <where>
       <if test="subject != null and subject != ''">
@@ -76,9 +83,29 @@
         and tq.question like '%' #{keyword,jdbcType=VARCHAR} '%'
       </if>
 
+      <if test="createdAt != null and createdAt != ''">
+        and cast(tq.created_at as date) = #{createdAt,jdbcType=VARCHAR}
+      </if>
+
+      <if test="updatedAt != null and updatedAt != ''">
+        and cast(tq.updated_at as date) = #{updatedAt,jdbcType=VARCHAR}
+      </if>
+
       <if test="userId != null and userId != ''">
         and tq.created_by = #{userId,jdbcType=VARCHAR}
       </if>
     </where>
   </select>
+
+  <!-- 新建问题 -->
+  <insert id="insertUserCreateQuestion" parameterType="org.mrying.chat.model.Question">
+    insert into tbl_question (id, question, content,
+                              subject, difficulty,
+                              created_at, created_by
+    )
+    values (#{id,jdbcType=CHAR}, #{question,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+            #{subject,jdbcType=CHAR}, #{difficulty,jdbcType=CHAR},
+            #{createdAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=CHAR}
+           )
+  </insert>
 </mapper>

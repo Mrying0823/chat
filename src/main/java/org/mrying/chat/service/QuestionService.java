@@ -16,4 +16,7 @@ public interface QuestionService {
 
     // 根据查询条件获取问题数量
     int queryCountOfQuestionByCondition(Map<String,Object> map);
+
+    // 保存用户创建的问题
+    int saveUserCreateQuestion(Question question);
 }

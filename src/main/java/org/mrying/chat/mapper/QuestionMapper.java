@@ -17,4 +17,7 @@ public interface QuestionMapper {
 
     // 根据查询条件获取问题数量
     int selectCountOfQuestionByCondition(Map<String,Object> map);
+
+    // 新建问题
+    int insertUserCreateQuestion(Question question);
 }
