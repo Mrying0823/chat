@@ -6,14 +6,14 @@
             ref="mavonEditorRef"
             v-model="markdownContent"
             :toolbars="toolbars"
-            :externalLink="false"
-            style="height: calc(100vh - 100px);"
+            style="min-height: calc(100vh - 100px)"
             :style="this.$store.getters.getDarkMode ? 'background-color: #18392F;color: #f0f0f0': ''"
             @save="createWikiSave(0)"
             @imgAdd="addMarkdownImage"
             :toolbarsBackground="nightMode"
             :editor-background="nightMode"
             :preview-background="nightMode"
+            :ishljs = "true"
             placeholder="请输入问题内容"
             class="page-content-editor wang-editor-body"
         >
@@ -23,6 +23,7 @@
                 aria-hidden="true"
                 title="求助 ChatGPT"
                 class="op-icon"
+                @click="seekHelp"
             >
               <i class="fa fa-comment"></i>
             </button>
@@ -57,6 +58,12 @@
 import {mavonEditor} from 'mavon-editor'
 import 'mavon-editor/dist/markdown/github-markdown.min.css'
 import 'mavon-editor/dist/css/index.css'
+import qs from "qs";
+import {EventSourcePolyfill} from "event-source-polyfill";
+import {ref} from "vue";
+import {useRouter} from "vue-router";
+import {ElMessage} from "element-plus";
+import {useQuestionData} from "@/store/questionData";
 
 // eslint-disable-next-line no-unused-vars
 const props = defineProps(["nightMode"]);
@@ -94,6 +101,100 @@ let toolbars = {
   subfield: true, // 单双栏模式
   preview: true, // 预览
 };
+
+const generating = ref(false);
+
+const onSendMessage = async (inputMessage) => {
+  // 发送消息为空
+  if (!inputMessage) {
+    // 使用$message提示错误信息
+    ElMessage({
+      type: "warning",
+      message: "问题不能为空",
+      center: true
+    });
+    return;
+  }
+
+  // 回答未结束
+  if (generating.value) {
+    // 使用$message提示错误信息
+    ElMessage({
+      type: "warning",
+      message: "服务繁忙，请稍后重试",
+      center: true
+    });
+    return;
+  }
+
+  generating.value = true;
+
+  await onGetMessage(inputMessage);
+}
+
+const storeQuestion = useQuestionData();
+
+let markdownContent = ref(storeQuestion.currentEditQuestion.content);
+
+const onGetMessage = async (inputMessage) => {
+  const data = { usePublicApi: true, prompt: inputMessage };
+  const requestData = qs.stringify(data);
+
+  const accessToken = localStorage.getItem('accessToken');
+
+  if (accessToken) {
+    const headers = {
+      Authorization: `${accessToken}`,
+    };
+
+    let sse = new EventSourcePolyfill(
+        `http://localhost:8081/api/v1/chatgpt/chatForNote?${requestData}`,
+        {
+          withCredentials: true,
+          headers,
+        }
+    );
+
+    sse.addEventListener('open', () => {
+      console.log('open');
+      generating.value = true;
+    });
+
+    sse.addEventListener('message', (event) => {
+      if (event.data === '[DONE]') {
+        sse.close();
+        generating.value = false;
+        return;
+      }
+      let answer = JSON.parse(event.data).content;
+
+      markdownContent.value += answer;
+    });
+
+    sse.addEventListener('error', (event) => {
+      console.log('error: ' + event.data);
+      sse.close();
+
+      // 使用$message提示错误信息
+
+      generating.value = true;
+
+      setTimeout(() => {
+        generating.value = false;
+      }, 5000);
+    });
+  }
+}
+
+const router = useRouter();
+
+const question = ref(router.currentRoute.value.query.question);
+
+const seekHelp = () => {
+  onSendMessage(question.value);
+}
+
+defineExpose({markdownContent});
 </script>
 
 <style scoped>
