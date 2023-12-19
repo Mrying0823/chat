@@ -6,6 +6,7 @@
         border
         class="list"
         height="540"
+        :default-sort="{ order: 'ascending' }"
     >
       <el-table-column prop="subject" label="专题" width="160" align="center" :resizable="false">
         <template #default="scope">
@@ -43,6 +44,26 @@
               effect="light"
           >
             {{ scope.row.difficulty }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createdDate" label="创建日期" width="120" align="center" :resizable="false" sortable>
+        <template #default="scope">
+          <el-tag
+              size="small"
+              effect="light"
+          >
+            {{ scope.row.createdDate }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="updatedDate" label="修改日期" width="120" align="center" :resizable="false" sortable>
+        <template #default="scope">
+          <el-tag
+              size="small"
+              effect="light"
+          >
+            {{ scope.row.updatedDate }}
           </el-tag>
         </template>
       </el-table-column>
@@ -98,6 +119,9 @@ import {ElConfigProvider} from 'element-plus'
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import {useQuestionData} from "@/store/questionData";
 import {ref} from "vue";
+import {useRouter} from "vue-router";
+
+const router = useRouter();
 
 const storeQuestion = useQuestionData();
 
@@ -108,6 +132,7 @@ const pageNo = ref(storeQuestion.pageNo);
 
 const pageSize = ref(storeQuestion.pageSize);
 
+// 查看详细
 const handleDetail = (question,event) => {
   // 按钮失焦
   event.target.blur();
@@ -119,6 +144,26 @@ const handleDetail = (question,event) => {
 
   storeQuestion.question = question.question;
   storeQuestion.content = question.content;
+}
+
+// 编辑问题
+const handleEdit = (question,event) => {
+  // 按钮失焦
+  event.target.blur();
+  if(event.target.nodeName === "SPAN") {
+    event.target.parentNode.blur();
+  }
+
+  storeQuestion.currentEditQuestion.id = question.id;
+  storeQuestion.currentEditQuestion.question = question.question;
+  storeQuestion.currentEditQuestion.stage = question.stage;
+  storeQuestion.currentEditQuestion.subject = question.subject;
+  storeQuestion.currentEditQuestion.difficulty = question.difficulty;
+  storeQuestion.currentEditQuestion.content = question.content;
+
+  router.push({
+    path: '/question/editQuestion'
+  });
 }
 
 const handleSizeChange = () => {
