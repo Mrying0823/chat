@@ -4,7 +4,7 @@
       <el-input v-if="true" v-model="question" :maxlength="40" placeholder="请输入标题" class="page-title-input" ></el-input>
     </el-col>
     <el-col style="flex: 0 0 180px;text-align: right;">
-      <el-button ref="resetBtn" type="primary" @click="confirm = true">保存</el-button>
+      <el-button ref="resetBtn" type="primary" @click="createQuestionSaveConfirm($event)">保存</el-button>
       <el-button ref="resetBtn" @click="createQuestionCancel" style="margin-right: 5px">取消</el-button>
     </el-col>
   </el-row>
@@ -29,7 +29,7 @@
                 v-for="stage in storeQuestion.stageList"
                 :key="stage.id"
                 :label="stage.value"
-                :value="stage.value"
+                :value="stage.id"
             />
           </el-select>
         </el-space>
@@ -46,7 +46,7 @@
                 v-for="subject in storeQuestion.subjectList"
                 :key="subject.id"
                 :label="subject.value"
-                :value="subject.value"
+                :value="subject.id"
             />
           </el-select>
         </el-space>
@@ -63,44 +63,79 @@
                 v-for="difficulty in storeQuestion.difficultyList"
                 :key="difficulty.id"
                 :label="difficulty.value"
-                :value="difficulty.value"
+                :value="difficulty.id"
             />
           </el-select>
         </el-space>
       </el-col>
     </el-row>
     <template #footer>
-        <el-button @click="confirm = false">
-          继续编辑
-        </el-button>
-        <el-button type="primary" @click="createQuestionSave">
-          确定
-        </el-button>
+      <el-button @click="confirm = false">
+        继续编辑
+      </el-button>
+      <el-button type="primary" @click="createQuestionSave" v-if="create">
+        确定
+      </el-button>
+      <el-button type="primary" @click="editQuestionSave" v-if="edit">
+        确认修改
+      </el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup>
 import { useRouter } from "vue-router";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {ElMessageBox} from "element-plus";
 import {useQuestionData} from "@/store/questionData";
+import {useLoadingDisplay} from "@/store/loadingDisplay";
 
 const storeQuestion = useQuestionData();
+const loadingDisplay = useLoadingDisplay();
 
 const router = useRouter();
 
 const resetBtn = ref();
 
-const question = ref(router.currentRoute.value.query.question);
-const stage = ref();
-const subject = ref();
-const difficulty = ref();
+let question = ref();
+
+const stage = ref(storeQuestion.currentEditQuestion.stage);
+const subject = ref(storeQuestion.currentEditQuestion.subject);
+const difficulty = ref(storeQuestion.currentEditQuestion.difficulty);
 
 let confirm = ref(false);
 
+// eslint-disable-next-line no-unused-vars
+const props = defineProps(["create", "edit"]);
+
+const emit = defineEmits(['saveCreateQuestion']);
+
+const createQuestionSaveConfirm = (event) => {
+  // 按钮失焦
+  event.target.blur();
+  if(event.target.nodeName === "SPAN") {
+    event.target.parentNode.blur();
+  }
+
+  confirm.value = true;
+}
+
 const createQuestionSave = () => {
   resetBtn.value.ref.blur();
+
+  loadingDisplay.display = true
+
+  //传递给父组件
+  emit('saveCreateQuestion',"");
+}
+
+const editQuestionSave = () => {
+  resetBtn.value.ref.blur();
+
+  loadingDisplay.display = true
+
+  //传递给父组件
+  emit('editQuestionSave',"");
 }
 
 const createQuestionCancel = () => {
@@ -115,11 +150,21 @@ const createQuestionCancel = () => {
         type: 'warning',
       }
   ).then(() => {
-        router.back()
+        router.back();
   }).catch(() => {
 
   });
 }
+
+defineExpose({question,stage,subject,difficulty});
+
+onMounted(() => {
+  if(props.create) {
+    question.value = router.currentRoute.value.query.question;
+  }else if(props.edit) {
+    question.value = storeQuestion.currentEditQuestion.question;
+  }
+});
 </script>
 
 <style scoped>
