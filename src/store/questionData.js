@@ -7,6 +7,8 @@ export const useQuestionData = defineStore('questionData', {
             pageNo: 1,
             // 当前页面大小
             pageSize: 10,
+            // 阶段
+            stage: "",
             // 专题
             subject: "",
             // 关键词
@@ -30,7 +32,9 @@ export const useQuestionData = defineStore('questionData', {
             // 难度列表
             difficultyList: [],
             // 阶段列表
-            stageList: []
+            stageList: [],
+            // 当前编辑问题
+            currentEditQuestion: {}
         }
     },
 })
