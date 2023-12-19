@@ -105,7 +105,7 @@ const handleNodeClick = (data) => {
   router.push({
     path: '/wiki/wikiPdf',
     query: {pageSrc: storePage.pageInfo.pageSrc}
-  })
+  });
 }
 
 let wikiPageTreeRef = ref();
