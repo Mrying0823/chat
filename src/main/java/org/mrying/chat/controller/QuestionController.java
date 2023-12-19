@@ -165,4 +165,40 @@ public class QuestionController extends BaseController {
 
         return respResult;
     }
+
+    // 保存编辑问题
+    @ApiOperation(value = "编辑问题",notes = "保存用户编辑的问题")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "问题 Id"),
+            @ApiImplicitParam(name = "question", value = "问题"),
+            @ApiImplicitParam(name = "stage", value = "阶段"),
+            @ApiImplicitParam(name = "subject", value = "专题"),
+            @ApiImplicitParam(name = "difficulty", value = "难度"),
+            @ApiImplicitParam(name = "content", value = "内容")
+    })
+    @PostMapping(path = "/questionList/saveEditQuestion")
+    public RespResult saveEditQuestion(String id, String question, String stage, String subject, String difficulty, String content) {
+        RespResult respResult = RespResult.fail();
+
+        Question newQuestion = new Question();
+
+        newQuestion.setId(id);
+        newQuestion.setQuestion(question);
+        newQuestion.setStage(stage);
+        newQuestion.setSubject(subject);
+        newQuestion.setDifficulty(difficulty);
+        newQuestion.setContent(content);
+        newQuestion.setUpdatedAt(new Date());
+        newQuestion.setUpdatedBy(SecurityContextHolderUtils.getUserId());
+
+        int result = questionService.saveUserEditQuestion(newQuestion);
+
+        if(result > 0) {
+            respResult = RespResult.ok();
+        }else {
+            respResult.setMsg("服务繁忙，请稍后重试");
+        }
+
+        return respResult;
+    }
 }

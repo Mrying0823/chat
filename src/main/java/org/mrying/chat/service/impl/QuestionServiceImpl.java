@@ -50,4 +50,9 @@ public class QuestionServiceImpl implements QuestionService {
     public int saveUserCreateQuestion(Question question) {
         return questionMapper.insertUserCreateQuestion(question);
     }
+
+    @Override
+    public int saveUserEditQuestion(Question question) {
+        return questionMapper.updateUserEditQuestion(question);
+    }
 }

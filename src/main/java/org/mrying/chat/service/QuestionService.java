@@ -19,4 +19,7 @@ public interface QuestionService {
 
     // 保存用户创建的问题
     int saveUserCreateQuestion(Question question);
+
+    // 保存用户编辑的问题
+    int saveUserEditQuestion(Question question);
 }

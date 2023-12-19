@@ -27,7 +27,7 @@
     left join tbl_dic_value tdv on tdv.id = tq.subject
     left join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
     join blog_user bu on bu.user_id = tq.created_by
-    join blog_user bu2 on bu2.user_id = tq.updated_by
+    left join blog_user bu2 on bu2.user_id = tq.updated_by
 
     <where>
       <if test="subject != null and subject != ''">
@@ -68,7 +68,7 @@
     left join tbl_dic_value tdv on tdv.id = tq.subject
     left join tbl_dic_value tdv2 on tdv2.id = tq.difficulty
     join blog_user bu on bu.user_id = tq.created_by
-    join blog_user bu2 on bu2.user_id = tq.updated_by
+    left join blog_user bu2 on bu2.user_id = tq.updated_by
 
     <where>
       <if test="subject != null and subject != ''">
@@ -108,4 +108,16 @@
             #{createdAt,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=CHAR}
            )
   </insert>
+
+  <!-- 更新问题 -->
+  <update id="updateUserEditQuestion" parameterType="org.mrying.chat.model.Question">
+    update tbl_question
+    set question = #{question,jdbcType=VARCHAR},
+        content = #{content,jdbcType=VARCHAR},
+        subject = #{subject,jdbcType=CHAR},
+        difficulty = #{difficulty,jdbcType=CHAR},
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+        updated_by = #{updatedBy,jdbcType=CHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
 </mapper>

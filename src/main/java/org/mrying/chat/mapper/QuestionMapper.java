@@ -20,4 +20,7 @@ public interface QuestionMapper {
 
     // 新建问题
     int insertUserCreateQuestion(Question question);
+
+    // 保存用户编辑的问题
+    int updateUserEditQuestion(Question question);
 }
