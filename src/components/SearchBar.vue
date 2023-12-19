@@ -135,7 +135,7 @@ const createQuestion = () => {
 
     router.push({
       path: "/question/editQuestion",
-      query: {question: question.value}
+      query: {question: question.value, isNewQuestion: true}
     });
   }).catch(() => {
     ElMessage({
